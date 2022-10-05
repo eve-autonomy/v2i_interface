@@ -164,13 +164,13 @@ This is the sender status of the most recently sent V2I infrastructure control c
 ## Vector map configuration
 Add every optional tags below to virtual traffic light object.
 
-| 設定値 | 値の範囲 | 説明 |
+| Name | Range | Description |
 |--|--|--|
-| type | eva_beacon_system | 固定値（他のVirtualTrafficLightオブジェクトとの区別用） |
-| eva_beacon_system:id | 1~254 | アクセスする設備の機器番号（設備側netPIのコンフィグで設定する値） |  |
-| eva_beacon_system:ref:section | REQUESTING | start_line～ref_line～end_lineの間で、ON制御を出す区間を選択（複数選択可能）<br>・REQUESTING：start_line～ref_line<br>・指定なし：start_line～end_line |
-| eva_beacon_system:ref:permit_state | DRIVING | ON制御を出す車両状態を選択（複数選択可能）<br>・DRIVING：走行中<br>・指定なし：車両状態にかかわらない<br>※注意：ルート配信前は、インフラ自体を検出しないため指定不可能 |
-| eva_beacon_system:ref:request_bit | 0x0~0x0f | ON制御によりHigh信号を出力するGPIO番号0~3のbit組み合わせ |
-| eva_beacon_system:ref:expect_bit | 0x0~0x0f | 停止判断を実施する際の期待値 |
-| eva_beacon_system:ref:response_type | ALWAYS<br>AND<br>MATCH | 停止判断で、許可と判断する条件<br>許可の場合は、Autoware側に対し停止の解除を指示<br>※High信号が入力されているGPIO番号0~3のbit組み合わせをvalue_bitとした場合<br>・ALWAYS： value_bit、expect_bitにかかわらず常に許可<br>・AND：`expect _bit & value_bit ≠0`で許可<br>・MATCH：`expect _bit = value_bit`で許可 |
-| eva_beacon_system:ref:mode | FIXED_VALUE<br>TURN_DIRECTION | ・FIXED_VALUE<br>下記のrequest_bitとexpect_bitをそのまま使用する<br>・TURN_DIRECTION<br>VirtualTraficLightオブジェクトが紐づく経路のturn_direction値に基いて、request_bitとexpect_bitを算出して、ON制御と停止判断を行う<br>※bit0:直進、bit1:右折、bit2：左折 |
+| type | eva_beacon_system | Fixed value（To identify from other VirtualTrafficLight objects.） |
+| eva_beacon_system:id | 1-254 | ID which set to the equipment side beacon device. |  |
+| eva_beacon_system:ref:section | REQUESTING | Selects a section that enables V2I control.<br>- REQUESTING: start_line to ref_line<br>- (Empty): start_line to end_line |
+| eva_beacon_system:ref:permit_state | DRIVING | Selects vehicle states which enables V2I control.<br>- DRIVING: During driving<br>- (Empty): Do not care the vehicle states<br>* This can't specify the behivior before a route supplied. |
+| eva_beacon_system:ref:request_bit | 0x0-0x0f | Value to be output by GPIO when the V2I control enabled. |
+| eva_beacon_system:ref:expect_bit | 0x0-0x0f | Expected value which use with stop control specified by response_type. |
+| eva_beacon_system:ref:response_type | ALWAYS<br>AND<br>MATCH | Specifies how the beacon system allow the vehicle to pass. <br>- ALWAYS: Always allows without calculation of value_bit and expect_bit.<br>- AND: Allows when `expect_bit & value_bit ≠0`<br>- MATCH: Allows when `expect_bit = value_bit` |
+| eva_beacon_system:ref:mode | FIXED_VALUE<br>TURN_DIRECTION | - FIXED_VALUE<br>Use request_bit and expect_bit as specified.<br>- TURN_DIRECTION<br>Calculate request_bit and expect_bit based on turn_direction value of VirtualTrafficLight lanelet object.<br>※bit0: Straight、bit1: Turn right、bit2: Turn left |
