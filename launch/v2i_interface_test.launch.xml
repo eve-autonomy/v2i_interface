@@ -21,7 +21,7 @@
 
   <group>
     <push-ros-namespace namespace="v2i_interface"/>
-    <node pkg="v2i_interface" exec="v2i_interface_test" name="v2i_interface_test" output="screen">
+    <node pkg="v2i_interface" exec="v2i_interface_test.py" name="v2i_interface_test" output="screen">
       <param from="$(var config_dir)/$(var operation_mode)/v2i_interface.param.yaml" />
     </node>
   </group>

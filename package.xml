@@ -26,14 +26,22 @@
 
   <license>Apache License 2.0</license>
 
+  <buildtool_depend>ament_cmake_auto</buildtool_depend>
+  <buildtool_depend>autoware_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_python</buildtool_depend>
+
+  <depend>rclcpp</depend>
   <depend>rclpy</depend>
   <depend>tier4_v2x_msgs</depend>
   <depend>autoware_state_machine_msgs</depend>
   <depend>v2i_interface_params</depend>
 
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>autoware_lint_common</test_depend>
+
   <exec_depend>launch_ros</exec_depend>
 
   <export>
-    <build_type>ament_python</build_type>
+    <build_type>ament_cmake</build_type>
   </export>
 </package>
