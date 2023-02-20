@@ -26,7 +26,7 @@ from tier4_v2x_msgs.msg import (
     VirtualTrafficLightState, VirtualTrafficLightStateArray
 )
 
-from v2i_interface import udp_control
+import udp_control
 
 import rclpy
 from rclpy.node import Node
