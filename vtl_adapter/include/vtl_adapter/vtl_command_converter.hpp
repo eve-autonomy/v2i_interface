@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License
 
-#ifndef VTL_ADAPTER__VTL_COMMAND_ADAPTER_HPP_
-#define VTL_ADAPTER__VTL_COMMAND_ADAPTER_HPP_
+#ifndef VTL_ADAPTER__VTL_COMMAND_CONVERTER_HPP_
+#define VTL_ADAPTER__VTL_COMMAND_CONVERTER_HPP_
 
 #include <optional>
 #include "rclcpp/rclcpp.hpp"
@@ -67,4 +67,4 @@ private:
 
 }  // namespace vtl_command_converter
 
-#endif  // VTL_ADAPTER__VTL_COMMAND_ADAPTER_HPP_
+#endif  // VTL_ADAPTER__VTL_COMMAND_CONVERTER_HPP_
