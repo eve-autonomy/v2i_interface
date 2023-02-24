@@ -44,7 +44,7 @@ VtlCommandConverterNode::VtlCommandConverterNode(
     rclcpp::QoS{1});
 }
 
-void VtlCommandConverterNode::onCommand(const MainInputCommandArr::ConstSharedPtr& msg)
+void VtlCommandConverterNode::onCommand(const MainInputCommandArr::ConstSharedPtr msg)
 {
   const auto output_command = requestCommand(createConverter(msg));
   if (!output_command) {
@@ -53,7 +53,7 @@ void VtlCommandConverterNode::onCommand(const MainInputCommandArr::ConstSharedPt
   command_pub_->publish(output_command.value());
 }
 
-void VtlCommandConverterNode::onState(const SubInputState::ConstSharedPtr& msg)
+void VtlCommandConverterNode::onState(const SubInputState::ConstSharedPtr msg)
 {
   state_ = msg;
 }

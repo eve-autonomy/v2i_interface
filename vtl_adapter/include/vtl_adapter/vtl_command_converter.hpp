@@ -48,12 +48,12 @@ private:
   rclcpp::Publisher<MainOutputCommandArr>::SharedPtr command_pub_;
 
   // Subscription
-  rclcpp::Subscription<MainInputCommandArr::ConstSharedPtr>::SharedPtr command_sub_;
-  rclcpp::Subscription<SubInputState::ConstSharedPtr>::SharedPtr state_sub_;
+  rclcpp::Subscription<MainInputCommandArr>::SharedPtr command_sub_;
+  rclcpp::Subscription<SubInputState>::SharedPtr state_sub_;
 
   // Callback
-  void onCommand(const MainInputCommandArr::ConstSharedPtr& msg);
-  void onState(const SubInputState::ConstSharedPtr& msg);
+  void onCommand(const MainInputCommandArr::ConstSharedPtr msg);
+  void onState(const SubInputState::ConstSharedPtr msg);
 
   // Preprocess
   std::shared_ptr<InterfaceConverterArr> createConverter(
