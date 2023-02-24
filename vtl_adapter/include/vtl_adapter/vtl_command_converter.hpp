@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License
 
-#ifndef V2I_INTERFACE__VTL_COMMAND_ADAPTER_HPP_
-#define V2I_INTERFACE__VTL_COMMAND_ADAPTER_HPP_
+#ifndef VTL_ADAPTER__VTL_COMMAND_ADAPTER_HPP_
+#define VTL_ADAPTER__VTL_COMMAND_ADAPTER_HPP_
 
 #include <optional>
 #include "rclcpp/rclcpp.hpp"
@@ -25,7 +25,7 @@
 // sub input
 #include "autoware_state_machine_msgs/msg/state_machine.hpp"
 
-#include "v2i_interface/eve_vtl_interface_converter.hpp"
+#include "vtl_adapter/eve_vtl_interface_converter.hpp"
 
 namespace vtl_command_converter
 {
@@ -67,4 +67,4 @@ private:
 
 }  // namespace vtl_command_converter
 
-#endif  // V2I_INTERFACE__VTL_COMMAND_ADAPTER_HPP_
+#endif  // VTL_ADAPTER__VTL_COMMAND_ADAPTER_HPP_

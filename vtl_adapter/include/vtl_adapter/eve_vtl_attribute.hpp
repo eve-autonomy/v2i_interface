@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License
 
-#ifndef V2I_INTERFACE__EVE_VTL_ATTRIBUTE_HPP_
-#define V2I_INTERFACE__EVE_VTL_ATTRIBUTE_HPP_
+#ifndef VTL_ADAPTER__EVE_VTL_ATTRIBUTE_HPP_
+#define VTL_ADAPTER__EVE_VTL_ATTRIBUTE_HPP_
 
 #include <memory>
 #include <optional>
 
-#include "v2i_interface/eve_vtl_specification.hpp"
-#include "v2i_interface/autoware_lanelet_specification.hpp"
+#include "vtl_adapter/eve_vtl_specification.hpp"
+#include "vtl_adapter/autoware_lanelet_specification.hpp"
 
 namespace eve_vtl_attribute
 {
@@ -69,4 +69,4 @@ private:
 
 }  // namespace eve_vtl_attribute
 
-#endif  // V2I_INTERFACE__EVE_VTL_ATTRIBUTE_HPP_
+#endif  // VTL_ADAPTER__EVE_VTL_ATTRIBUTE_HPP_

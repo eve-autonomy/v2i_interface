@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License
 
-#ifndef V2I_INTERFACE__AUTOWARE_LANELET_SPECIFICATION_HPP_
-#define V2I_INTERFACE__AUTOWARE_LANELET_SPECIFICATION_HPP_
+#ifndef VTL_ADAPTER__AUTOWARE_LANELET_SPECIFICATION_HPP_
+#define VTL_ADAPTER__AUTOWARE_LANELET_SPECIFICATION_HPP_
 
 #include <memory>
 #include <string>
@@ -29,4 +29,4 @@ static const std::string INVALID_VALUE_TURN_DIRECTION = "";
 
 }  // namespace aw_lanelet_spec
 
-#endif  // V2I_INTERFACE__AUTOWARE_LANELET_SPECIFICATION_HPP_
+#endif  // VTL_ADAPTER__AUTOWARE_LANELET_SPECIFICATION_HPP_

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License
 
-#ifndef V2I_INTERFACE__EVE_VTL_INTERFACE_CONVERTER_HPP_
-#define V2I_INTERFACE__EVE_VTL_INTERFACE_CONVERTER_HPP_
+#ifndef VTL_ADAPTER__EVE_VTL_INTERFACE_CONVERTER_HPP_
+#define VTL_ADAPTER__EVE_VTL_INTERFACE_CONVERTER_HPP_
 
 #include <memory>
 #include <unordered_map>
@@ -22,7 +22,7 @@
 #include "tier4_v2x_msgs/msg/key_value.hpp"
 #include "autoware_state_machine_msgs/msg/state_machine.hpp"
 
-#include "v2i_interface/eve_vtl_attribute.hpp"
+#include "vtl_adapter/eve_vtl_attribute.hpp"
 
 namespace eve_vtl_interface_converter
 {
@@ -53,4 +53,4 @@ private:
 
 }  // namespace eve_vtl_interface_converter
 
-#endif  // V2I_INTERFACE__EVE_VTL_INTERFACE_CONVERTER_HPP_
+#endif  // VTL_ADAPTER__EVE_VTL_INTERFACE_CONVERTER_HPP_

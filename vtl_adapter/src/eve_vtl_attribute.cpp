@@ -16,7 +16,7 @@
 #include <memory>
 #include <optional>
 #include <algorithm>
-#include "v2i_interface/eve_vtl_attribute.hpp"
+#include "vtl_adapter/eve_vtl_attribute.hpp"
 
 namespace eve_vtl_attribute
 {

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License
 
-#ifndef V2I_INTERFACE__EVE_VTL_SPECIFICATION_HPP_
-#define V2I_INTERFACE__EVE_VTL_SPECIFICATION_HPP_
+#ifndef VTL_ADAPTER__EVE_VTL_SPECIFICATION_HPP_
+#define VTL_ADAPTER__EVE_VTL_SPECIFICATION_HPP_
 
 #include <memory>
 #include <string>
@@ -62,4 +62,4 @@ static const std::string VALUE_MODE_TURN_DIRECTION = "TURN_DIRECTION";
 
 }  // namespace eve_vtl_spec
 
-#endif  // V2I_INTERFACE__EVE_VTL_SPECIFICATION_HPP_
+#endif  // VTL_ADAPTER__EVE_VTL_SPECIFICATION_HPP_

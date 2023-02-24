@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License
 
-#include "v2i_interface/vtl_command_converter.hpp"
-#include "v2i_interface/eve_vtl_interface_converter.hpp"
+#include "vtl_adapter/vtl_command_converter.hpp"
+#include "vtl_adapter/eve_vtl_interface_converter.hpp"
 
 namespace vtl_command_converter
 {

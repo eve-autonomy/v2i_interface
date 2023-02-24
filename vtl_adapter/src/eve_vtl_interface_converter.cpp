@@ -13,9 +13,9 @@
 // limitations under the License
 
 
-#include "v2i_interface/eve_vtl_interface_converter.hpp"
-#include "v2i_interface/eve_vtl_specification.hpp"
-#include "v2i_interface/autoware_lanelet_specification.hpp"
+#include "vtl_adapter/eve_vtl_interface_converter.hpp"
+#include "vtl_adapter/eve_vtl_specification.hpp"
+#include "vtl_adapter/autoware_lanelet_specification.hpp"
 
 namespace eve_vtl_interface_converter
 {
