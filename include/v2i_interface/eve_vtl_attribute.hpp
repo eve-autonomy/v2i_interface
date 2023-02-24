@@ -15,10 +15,11 @@
 #ifndef V2I_INTERFACE__EVE_VTL_ATTRIBUTE_HPP_
 #define V2I_INTERFACE__EVE_VTL_ATTRIBUTE_HPP_
 
-#include "eve_vtl_specification.hpp"
-#include "autoware_lanelet_specification.hpp"
 #include <memory>
 #include <optional>
+
+#include "v2i_interface/eve_vtl_specification.hpp"
+#include "v2i_interface/autoware_lanelet_specification.hpp"
 
 namespace eve_vtl_attribute
 {

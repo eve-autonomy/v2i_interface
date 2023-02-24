@@ -26,11 +26,11 @@ rclcpp_components_register_node(vtl_command_converter
   EXECUTABLE vtl_command_converter_node
 )
 
-#ament_target_dependencies(vtl_command_converter
-#  rclcpp
-#  tier4_v2x_msgs
-#  v2i_interface_msgs
-#)
+ament_target_dependencies(vtl_command_converter
+  rclcpp
+  tier4_v2x_msgs
+  v2i_interface_msgs
+)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

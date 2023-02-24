@@ -17,11 +17,12 @@
 
 #include <memory>
 #include <unordered_map>
+#include "rclcpp/rclcpp.hpp"
 #include "tier4_v2x_msgs/msg/infrastructure_command.hpp"
 #include "tier4_v2x_msgs/msg/key_value.hpp"
 #include "autoware_state_machine_msgs/msg/state_machine.hpp"
 
-#include "eve_vtl_attribute.hpp"
+#include "v2i_interface/eve_vtl_attribute.hpp"
 
 namespace eve_vtl_interface_converter
 {
