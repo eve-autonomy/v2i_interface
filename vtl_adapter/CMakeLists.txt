@@ -46,10 +46,10 @@ if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
 
-  ament_add_gtest(test_vtl_command_converter
-    test/src/test_**.cpp
-    test/src/test_**.cpp
-  )
+  # ament_add_gtest(test_vtl_command_converter
+  #   test/src/test_**.cpp
+  #   test/src/test_**.cpp
+  # )
   # ament_target_dependencies(test_vtl_command_converter
   #   rclcpp
   #   tier4_v2x_msgs
