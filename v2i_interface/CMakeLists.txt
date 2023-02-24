@@ -15,27 +15,14 @@ find_package(ament_cmake_python REQUIRED)
 autoware_package()
 ament_auto_find_build_dependencies()
 
-ament_auto_add_library(vtl_command_converter SHARED
-  src/vtl_command_converter.cpp
-  src/eve_vtl_interface_converter.cpp
-  src/eve_vtl_attribute.cpp
-)
+#ament_auto_add_library(** SHARED
+#  src/**.cpp
+#)
 
-rclcpp_components_register_node(vtl_command_converter
-  PLUGIN "vtl_command_converter::VtlCommandConverterNode"
-  EXECUTABLE vtl_command_converter_node
-)
-
-ament_target_dependencies(vtl_command_converter
-  rclcpp
-  tier4_v2x_msgs
-  v2i_interface_msgs
-)
-
-if(BUILD_TESTING)
-  find_package(ament_lint_auto REQUIRED)
-  ament_lint_auto_find_test_dependencies()
-endif()
+#rclcpp_components_register_node(**
+#  PLUGIN ""
+#  EXECUTABLE lateral_error_publisher_node
+#)
 
 ament_python_install_package(scripts)
 install(
