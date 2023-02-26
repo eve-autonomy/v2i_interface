@@ -13,43 +13,58 @@
 // limitations under the License
 
 #include "vtl_adapter/vtl_command_converter.hpp"
+#include "vtl_adapter/interface_converter_data_pipeline.hpp"
 #include "vtl_adapter/eve_vtl_interface_converter.hpp"
 
 namespace vtl_command_converter
 {
 
-VtlCommandConverter::VtlCommandConverter(rclcpp::Node* node)
-: node_(node)
+VtlCommandConverter::VtlCommandConverter()
+: converter_pipeline_(new IFConverterDataPipeline)
+{}
+
+void VtlCommandConverter::init(rclcpp::Node* node)
 {
+  if (!node) {
+    return;
+  }
   using namespace std::placeholders;
 
-  auto group = node_->create_callback_group(
+  auto group = node->create_callback_group(
     rclcpp::CallbackGroupType::MutuallyExclusive);
   auto subscriber_option = rclcpp::SubscriptionOptions();
   subscriber_option.callback_group = group;
 
   // Subscription
-  command_sub_ = node_->create_subscription<MainInputCommandArr>(
+  command_sub_ = node->create_subscription<MainInputCommandArr>(
     "/awapi/tmp/infrastructure_commands", 1,
     std::bind(&VtlCommandConverter::onCommand, this, _1),
     subscriber_option);
-  state_sub_ = node_->create_subscription<SubInputState>(
+  state_sub_ = node->create_subscription<SubInputState>(
     "/autoware_state_machine/state", 1,
     std::bind(&VtlCommandConverter::onState, this, _1),
     subscriber_option);
   // Publisher
-  command_pub_ = node_->create_publisher<MainOutputCommandArr>(
+  command_pub_ = node->create_publisher<MainOutputCommandArr>(
     "/v2x/infrastructure_commands",
     rclcpp::QoS{1});
 }
 
+
+std::shared_ptr<IFConverterDataPipeline> VtlCommandConverter::converterPipeline()
+{
+  return converter_pipeline_;
+}
+
 void VtlCommandConverter::onCommand(const MainInputCommandArr::ConstSharedPtr msg)
 {
-  const auto output_command = requestCommand(createConverter(msg));
+  const auto converter_map = createConverter(msg);
+  const auto output_command = requestCommand(converter_map);
   if (!output_command) {
     return;
   }
   command_pub_->publish(output_command.value());
+  converter_pipeline_->add(converter_map);
 }
 
 void VtlCommandConverter::onState(const SubInputState::ConstSharedPtr msg)
@@ -57,36 +72,36 @@ void VtlCommandConverter::onState(const SubInputState::ConstSharedPtr msg)
   state_ = msg;
 }
 
-std::shared_ptr<InterfaceConverterArr> VtlCommandConverter::createConverter(
+std::shared_ptr<InterfaceConverterMap> VtlCommandConverter::createConverter(
     const MainInputCommandArr::ConstSharedPtr& original_command) const
 {
-  std::shared_ptr<InterfaceConverterArr> converter_array(new InterfaceConverterArr());
+  std::shared_ptr<InterfaceConverterMap> converter_array(new InterfaceConverterMap());
   for (const auto& orig_elem : original_command->commands) {
-    converter_array->emplace_back(new InterfaceConverter(orig_elem));
+    const auto converter(new InterfaceConverter(orig_elem));
+    const auto id_opt = converter->vtlAttribute()->id();
+    if (!id_opt) {
+      continue;
+    }
+    converter_array->emplace(id_opt.value(), converter);
   }
   return converter_array;
 }
 
 std::optional<MainOutputCommandArr> VtlCommandConverter::requestCommand(
-  const std::shared_ptr<InterfaceConverterArr>& converter_array) const
+  const std::shared_ptr<InterfaceConverterMap>& converter_array) const
 {
   MainOutputCommandArr command_array;
   for (const auto& elem : *converter_array) {
-    const auto& attr = elem->vtlAttribute();
-    const auto& req = elem->request(state_);
-    if (!attr) {
-      continue;
-    }
-    else if (!attr->id()) {
-      continue;
-    }
+    const auto& id = elem.first;
+    const auto& converter = elem.second;
+    const auto& req = converter->request(state_);
     if (!req) {
       continue;
     }
     MainOutputCommand command;
     {
-      command.stamp = elem->command().stamp;
-      command.id = attr->id().value();
+      command.stamp = converter->command().stamp;
+      command.id = id;
       command.state = req.value();
     }
     command_array.commands.emplace_back(command);

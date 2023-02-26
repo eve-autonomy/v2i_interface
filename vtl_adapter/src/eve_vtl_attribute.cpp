@@ -71,6 +71,11 @@ EveVTLAttr::EveVTLAttr() :
 {
 }
 
+void EveVTLAttr::setType(const std::string& type)
+{
+  type_ = type;
+}
+
 bool EveVTLAttr::setID(const std::string& id_str)
 {
   id_ = stringToInt(id_str);
@@ -171,6 +176,11 @@ bool EveVTLAttr::isValidAttr() const
 const std::optional<uint8_t>& EveVTLAttr::id() const
 {
   return id_;
+}
+
+const std::string& EveVTLAttr::type() const
+{
+  return type_;
 }
 
 const std::optional<std::string>& EveVTLAttr::permitState() const

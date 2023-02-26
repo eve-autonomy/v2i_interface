@@ -25,6 +25,7 @@
 // sub input
 #include "autoware_state_machine_msgs/msg/state_machine.hpp"
 
+#include "vtl_adapter/interface_converter_data_pipeline.hpp"
 #include "vtl_adapter/eve_vtl_interface_converter.hpp"
 
 namespace vtl_command_converter
@@ -37,12 +38,17 @@ using InterfaceConverter = eve_vtl_interface_converter::EveVTLInterfaceConverter
 
 using SubInputState = autoware_state_machine_msgs::msg::StateMachine;
 
-using InterfaceConverterArr = std::vector<std::shared_ptr<InterfaceConverter>>;
+using InterfaceConverterMap =
+  std::unordered_map<uint8_t, std::shared_ptr<InterfaceConverter>>;
+using IFConverterDataPipeline =
+  interface_converter_data_pipeline::IFConverterDataPipeline;
 
 class VtlCommandConverter
 {
 public:
-  explicit VtlCommandConverter(rclcpp::Node* node);
+  VtlCommandConverter();
+  void init(rclcpp::Node* node);
+  std::shared_ptr<IFConverterDataPipeline> converterPipeline();
 private:
   rclcpp::Node* node_;
 
@@ -58,13 +64,14 @@ private:
   void onState(const SubInputState::ConstSharedPtr msg);
 
   // Preprocess
-  std::shared_ptr<InterfaceConverterArr> createConverter(
+  std::shared_ptr<InterfaceConverterMap> createConverter(
     const MainInputCommandArr::ConstSharedPtr& original_command) const;
   std::optional<MainOutputCommandArr> requestCommand(
-    const std::shared_ptr<InterfaceConverterArr>& converter_array) const;
+    const std::shared_ptr<InterfaceConverterMap>& converter_array) const;
 
   //member variables
   SubInputState::ConstSharedPtr state_;
+  std::shared_ptr<IFConverterDataPipeline> converter_pipeline_;
 };
 
 }  // namespace vtl_command_converter

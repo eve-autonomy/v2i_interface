@@ -33,7 +33,9 @@ ament_auto_find_build_dependencies()
 ament_auto_add_library(vtl_adapter
   SHARED
   src/vtl_adapter.cpp
+  src/vtl_state_converter.cpp
   src/vtl_command_converter.cpp
+  src/interface_converter_data_pipeline.cpp
   src/eve_vtl_interface_converter.cpp
   src/eve_vtl_attribute.cpp
 )

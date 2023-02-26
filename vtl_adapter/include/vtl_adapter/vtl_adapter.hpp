@@ -16,23 +16,23 @@
 #define VTL_ADAPTER__VTL_ADAPTER_HPP_
 
 #include "vtl_adapter/vtl_command_converter.hpp"
-//#include "vtl_adapter/vtl_status_converter.hpp"
+#include "vtl_adapter/vtl_state_converter.hpp"
 
 namespace vtl_adapter
 {
+using VtlCommandConverter = vtl_command_converter::VtlCommandConverter;
+using VtlStateConverter = vtl_state_converter::VtlStateConverter;
 
 class VtlAdapterNode : public rclcpp::Node
 {
 public:
-  using VtlCommandConverter = vtl_command_converter::VtlCommandConverter;
-  //using VtlStatusConverter = vtl_status_converter::VtlStatusConverter;
   explicit VtlAdapterNode(const rclcpp::NodeOptions & options);
 private:
   // command converter
   VtlCommandConverter command_converter_;
   
-  // status converter
-  //VtlStatusConverter status_converter_;
+  // state converter
+  VtlStateConverter state_converter_;
 };
 
 }  // namespace vtl_adapter

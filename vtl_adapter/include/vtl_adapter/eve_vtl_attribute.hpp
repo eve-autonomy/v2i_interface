@@ -28,6 +28,7 @@ class EveVTLAttr
 {
 public:
   EveVTLAttr();
+  void setType(const std::string& type);
   bool setID(const std::string& id_str);
   bool setMode(const std::string& mode);
   bool setRequestBit(const std::string& input_bit);
@@ -39,6 +40,7 @@ public:
 
   bool isValidAttr() const;
   const std::optional<uint8_t>& id() const;
+  const std::string& type() const;
   const std::optional<std::string>& permitState() const;
   std::optional<uint8_t> request(
     const std::string& infra_cmd,
@@ -57,6 +59,7 @@ private:
   std::optional<uint8_t> fixedBit(const std::string& input_bit) const;
   std::optional<uint8_t> turnDirectionBit() const;
 
+  std::string type_;
   std::optional<uint8_t> id_;
   std::optional<std::string> response_type_;
   std::optional<std::string> mode_;

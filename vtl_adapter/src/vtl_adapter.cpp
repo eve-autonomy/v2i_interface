@@ -19,10 +19,12 @@ namespace vtl_adapter
 
 VtlAdapterNode::VtlAdapterNode(
   const rclcpp::NodeOptions & options = rclcpp::NodeOptions())
-: Node("vtl_adapter", options),
-  //status_converter_(this),
-  command_converter_(static_cast<rclcpp::Node*>(this))
+: Node("vtl_adapter", options)
 {
+  state_converter_.init(static_cast<rclcpp::Node*>(this));
+  command_converter_.init(static_cast<rclcpp::Node*>(this));
+  state_converter_.acceptConverterPipeline(
+    command_converter_.converterPipeline());
 }
 
 }  // namespace vtl_adapter
