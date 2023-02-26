@@ -18,6 +18,7 @@
 import signal
 import threading
 import time
+from rclpy.time import Time
 
 from v2i_interface_msgs.msg import (
     InfrastructureCommand, InfrastructureCommandArray,
@@ -39,6 +40,8 @@ class V2iInterfaceNode(Node):
 
         timer_period = 0.1
         self._udp_recv_interval = 0.1
+
+        self._data_store_timeout_sec = 1.0
 
         ip_address = self.declare_parameter("ip_address", "127.0.0.1")
         send_port = self.declare_parameter("send_port", 0)
@@ -75,8 +78,11 @@ class V2iInterfaceNode(Node):
         self._recv_th.start()
 
         self._logger.info("initialized")
-        self._recv_array=[]
-        self._command_array=InfrastructureCommandArray()
+        self._recv_array = []
+        self._recv_stamp = self.get_clock().now()
+        self._request_array = []
+        self._request_stamp = self.get_clock().now()
+
 
     def __del__(self):
         self.fin()
@@ -99,25 +105,17 @@ class V2iInterfaceNode(Node):
             if(len(recv_array) > 0):
                 with self.recv_lock:
                     self._recv_array = recv_array
+                    self._recv_stamp = self.get_clock().now()
 
             time.sleep(self._udp_recv_interval)
 
     def on_command_array(self, command_array):
         if(command_array is None):
             return
-        self._command_array = command_array
-
-    def output_timer(self):
-        self.send_udp_command()
-        self.publish_infrastructure_states()
-
-    def send_udp_command(self):
-        if(self._command_array is None):
-            return
-        if(self._command_array.commands is None):
+        if(command_array.commands is None):
             return
         request_array = []
-        for command in self._command_array.commands:
+        for command in command_array.commands:
             if(command.state == InfrastructureCommand.NONE or
                command.state == InfrastructureCommand.INTURRUPT_STOP):
                 continue
@@ -128,9 +126,26 @@ class V2iInterfaceNode(Node):
             ret_value["id"] = command.id
             ret_value["request"] = state
             request_array.append(ret_value)
-        if(len(request_array) > 0):
-            self._udp.send(request_array)
-            self._logger.info("send udp {0}".format(request_array))
+        self._request_array = request_array
+        self._request_stamp = self.get_clock().now()
+
+    def output_timer(self):
+        self.send_udp_command()
+        self.publish_infrastructure_states()
+        if (len(self._request_array) > 0):
+            if (self.is_timeout(self._request_stamp)):
+                self._request_array = []
+        with self.recv_lock:
+            if (self._recv_array is not None):
+                if (self.is_timeout(self._recv_stamp)):
+                    self._recv_array = []
+
+    def send_udp_command(self):
+        if(self._request_array is None):
+            return
+        if(len(self._request_array) > 0):
+            self._udp.send(self._request_array)
+            self._logger.info("send udp {0}".format(self._request_array))
 
     def publish_infrastructure_states(self):
         with self.recv_lock:
@@ -151,6 +166,11 @@ class V2iInterfaceNode(Node):
 
     def convert_state(self, state : InfrastructureState):
         state.state = state.state >> 4
+
+    def is_timeout(self, stamp):
+        duration = self.get_clock().now() - stamp
+        duration_sec = duration.nanoseconds * 1e-9
+        return (duration_sec > self._data_store_timeout_sec)
 
 
 def shutdown(signal, frame):
