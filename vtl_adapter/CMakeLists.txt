@@ -30,16 +30,17 @@ find_package(ament_cmake_auto REQUIRED)
 ament_auto_find_build_dependencies()
 
 # Generate exe file
-ament_auto_add_library(vtl_command_converter
+ament_auto_add_library(vtl_adapter
   SHARED
+  src/vtl_adapter.cpp
   src/vtl_command_converter.cpp
   src/eve_vtl_interface_converter.cpp
   src/eve_vtl_attribute.cpp
 )
 
-rclcpp_components_register_node(vtl_command_converter
-  PLUGIN "vtl_command_converter::VtlCommandConverterNode"
-  EXECUTABLE vtl_command_converter_node
+rclcpp_components_register_node(vtl_adapter
+  PLUGIN "vtl_adapter::VtlAdapterNode"
+  EXECUTABLE vtl_adapter_node
 )
 
 if(BUILD_TESTING)

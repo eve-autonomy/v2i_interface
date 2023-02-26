@@ -18,33 +18,32 @@
 namespace vtl_command_converter
 {
 
-VtlCommandConverterNode::VtlCommandConverterNode(
-  const rclcpp::NodeOptions & options = rclcpp::NodeOptions())
-: Node("vtl_command_converter", options)
+VtlCommandConverter::VtlCommandConverter(rclcpp::Node* node)
+: node_(node)
 {
   using namespace std::placeholders;
 
-  auto group = create_callback_group(
+  auto group = node_->create_callback_group(
     rclcpp::CallbackGroupType::MutuallyExclusive);
   auto subscriber_option = rclcpp::SubscriptionOptions();
   subscriber_option.callback_group = group;
 
   // Subscription
-  command_sub_ = create_subscription<MainInputCommandArr>(
+  command_sub_ = node_->create_subscription<MainInputCommandArr>(
     "/awapi/tmp/infrastructure_commands", 1,
-    std::bind(&VtlCommandConverterNode::onCommand, this, _1),
+    std::bind(&VtlCommandConverter::onCommand, this, _1),
     subscriber_option);
-  state_sub_ = create_subscription<SubInputState>(
+  state_sub_ = node_->create_subscription<SubInputState>(
     "/autoware_state_machine/state", 1,
-    std::bind(&VtlCommandConverterNode::onState, this, _1),
+    std::bind(&VtlCommandConverter::onState, this, _1),
     subscriber_option);
   // Publisher
-  command_pub_ = create_publisher<MainOutputCommandArr>(
+  command_pub_ = node_->create_publisher<MainOutputCommandArr>(
     "/v2x/infrastructure_commands",
     rclcpp::QoS{1});
 }
 
-void VtlCommandConverterNode::onCommand(const MainInputCommandArr::ConstSharedPtr msg)
+void VtlCommandConverter::onCommand(const MainInputCommandArr::ConstSharedPtr msg)
 {
   const auto output_command = requestCommand(createConverter(msg));
   if (!output_command) {
@@ -53,12 +52,12 @@ void VtlCommandConverterNode::onCommand(const MainInputCommandArr::ConstSharedPt
   command_pub_->publish(output_command.value());
 }
 
-void VtlCommandConverterNode::onState(const SubInputState::ConstSharedPtr msg)
+void VtlCommandConverter::onState(const SubInputState::ConstSharedPtr msg)
 {
   state_ = msg;
 }
 
-std::shared_ptr<InterfaceConverterArr> VtlCommandConverterNode::createConverter(
+std::shared_ptr<InterfaceConverterArr> VtlCommandConverter::createConverter(
     const MainInputCommandArr::ConstSharedPtr& original_command) const
 {
   std::shared_ptr<InterfaceConverterArr> converter_array(new InterfaceConverterArr());
@@ -68,7 +67,7 @@ std::shared_ptr<InterfaceConverterArr> VtlCommandConverterNode::createConverter(
   return converter_array;
 }
 
-std::optional<MainOutputCommandArr> VtlCommandConverterNode::requestCommand(
+std::optional<MainOutputCommandArr> VtlCommandConverter::requestCommand(
   const std::shared_ptr<InterfaceConverterArr>& converter_array) const
 {
   MainOutputCommandArr command_array;
@@ -99,7 +98,3 @@ std::optional<MainOutputCommandArr> VtlCommandConverterNode::requestCommand(
 }
 
 }  // namespace vtl_command_converter
-
-#include "rclcpp_components/register_node_macro.hpp"
-
-RCLCPP_COMPONENTS_REGISTER_NODE(vtl_command_converter::VtlCommandConverterNode)

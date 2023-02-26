@@ -39,11 +39,13 @@ using SubInputState = autoware_state_machine_msgs::msg::StateMachine;
 
 using InterfaceConverterArr = std::vector<std::shared_ptr<InterfaceConverter>>;
 
-class VtlCommandConverterNode : public rclcpp::Node
+class VtlCommandConverter
 {
 public:
-  explicit VtlCommandConverterNode(const rclcpp::NodeOptions & options);
+  explicit VtlCommandConverter(rclcpp::Node* node);
 private:
+  rclcpp::Node* node_;
+
   // Publisher
   rclcpp::Publisher<MainOutputCommandArr>::SharedPtr command_pub_;
 
