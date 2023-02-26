@@ -46,7 +46,7 @@ void VtlCommandConverter::init(rclcpp::Node* node)
     subscriber_option);
   // Publisher
   command_pub_ = node->create_publisher<MainOutputCommandArr>(
-    "/v2x/infrastructure_commands",
+    "/v2i/infrastructure_commands",
     rclcpp::QoS{1});
 }
 

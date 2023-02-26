@@ -31,7 +31,7 @@ void VtlStateConverter::init(rclcpp::Node* node)
 
   // Subscription
   state_sub_ = node->create_subscription<InputStateArr>(
-    "/v2x/infrastructure_states", 1,
+    "/v2i/infrastructure_states", 1,
     std::bind(&VtlStateConverter::onState, this, _1),
     subscriber_option);
   // Publisher

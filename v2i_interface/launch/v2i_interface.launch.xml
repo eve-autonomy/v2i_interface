@@ -19,13 +19,12 @@
 
   <let name="config_dir" value="$(find-pkg-share v2i_interface_params)/config" />
 
-  <let name="input/command_array" value="/awapi/tmp/infrastructure_commands"/>
-  <let name="output/state_array" value="/system/v2x/virtual_traffic_light_states"/>
+  <let name="input/command_array" value="/v2i/infrastructure_commands"/>
+  <let name="output/state_array" value="/v2i/infrastructure_states"/>
 
   <group>
     <push-ros-namespace namespace="v2i_interface"/>
     <node pkg="v2i_interface" exec="v2i_interface.py" name="v2i_interface" output="screen">
-      <param name="use_sim_time" value="$(env AW_ROS2_USE_SIM_TIME false)" />
       <param from="$(var config_dir)/$(var operation_mode)/v2i_interface.param.yaml" />
       <remap from="~/input/command_array" to="$(var input/command_array)"/>
       <remap from="~/output/state_array" to="$(var output/state_array)"/>
