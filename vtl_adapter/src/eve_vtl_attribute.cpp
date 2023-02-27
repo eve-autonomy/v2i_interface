@@ -32,7 +32,7 @@ std::optional<uint8_t> stringToInt(const std::string& input_str)
 {
   uint8_t output_int;
   try {
-    output_int = std::stoi(input_str);
+    output_int = std::stoi(input_str, nullptr, 0);
   }
   catch (const std::invalid_argument& ex) {
     std::cerr << ex.what() << std::endl;
@@ -40,6 +40,10 @@ std::optional<uint8_t> stringToInt(const std::string& input_str)
   }
   catch (const std::out_of_range& ex) {
     std::cerr << ex.what() << std::endl;
+    return std::nullopt;
+  }
+  catch (...) {
+    std::cerr << "Unknown error" << std::endl;
     return std::nullopt;
   }
   return output_int;
@@ -259,7 +263,7 @@ bool EveVTLAttr::isValidType(const std::string& type) const
 
 bool EveVTLAttr::isValidBit(const uint8_t& bit) const
 {
-  return (bit < MIN_VALUE_BIT || bit > MAX_VALUE_BIT);
+  return (bit >= MIN_VALUE_BIT && bit <= MAX_VALUE_BIT);
 }
 
 bool EveVTLAttr::isValidDirection(const std::string& turn_direction) const
