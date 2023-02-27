@@ -1,0 +1,7 @@
+/**:
+  ros__parameters:
+    input_topics : [
+      "/cargo_loading/infrastructure_commands",
+      "/v2i_gate/infrastructure_commands"
+    ]
+    output_topic : "/v2i/infrastructure_commands"

@@ -1,0 +1,5 @@
+<launch>
+  <node pkg="v2i_command_muxer" exec="v2i_command_muxer_node" name="v2i_command_muxer" output="screen">
+    <param from="$(find-pkg-share v2i_command_muxer)/config/topic_definition.yaml"/>
+  </node>
+</launch>
