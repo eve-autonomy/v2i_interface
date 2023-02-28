@@ -29,7 +29,7 @@ Class public function
 EveVTLInterfaceConverter::EveVTLInterfaceConverter(const InfrastructureCommand& input_command)
   : command_(input_command)
 {
-  init(input_command.custom_tags);
+  init(input_command);
 }
 
 const std::shared_ptr<EveVTLAttr>& EveVTLInterfaceConverter::vtlAttribute() const
@@ -67,8 +67,15 @@ Class private function
 ***************************************************************
 */
 
-bool EveVTLInterfaceConverter::init(const std::vector<tier4_v2x_msgs::msg::KeyValue>& custom_tags)
+bool EveVTLInterfaceConverter::init(const InfrastructureCommand& input_command)
 {
+  const auto type = input_command.type;
+  // type == eva_bacon_system以外のときは初期化失敗
+  if (type != eve_vtl_spec::VALUE_TYPE) {
+    return false;
+  }
+
+  const auto& custom_tags = input_command.custom_tags;
   // custom_tagsが設定されてなければ初期化不要（失敗）
   if (custom_tags.empty()) {
     return false;
@@ -80,13 +87,6 @@ bool EveVTLInterfaceConverter::init(const std::vector<tier4_v2x_msgs::msg::KeyVa
     tags[tag.key] = tag.value;
   }
 
-  // type == eva_bacon_system以外のときは初期化失敗
-  if (tags.find(eve_vtl_spec::KEY_TYPE) == tags.end()) {
-    return false;
-  }
-  else if (tags.at(eve_vtl_spec::KEY_TYPE) != eve_vtl_spec::VALUE_TYPE) {
-    return false;
-  }
   // id, modeが適切に設定されてなければ初期化失敗
   // 成功時はattribute変数にidとmodeを代入する
   std::shared_ptr<EveVTLAttr> attr(new EveVTLAttr);

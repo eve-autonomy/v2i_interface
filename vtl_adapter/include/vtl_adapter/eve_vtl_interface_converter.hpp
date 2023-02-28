@@ -42,7 +42,7 @@ public:
     const StateMachine::ConstSharedPtr& state) const;
   bool response(const uint8_t& response_bit) const;
 private:
-  bool init(const std::vector<tier4_v2x_msgs::msg::KeyValue>& custom_tags);
+  bool init(const InfrastructureCommand& input_command);
   std::string convertInfraCommand(const uint8_t& input_command) const;
   std::optional<std::string> convertADState(
     const StateMachine::ConstSharedPtr& state) const;
