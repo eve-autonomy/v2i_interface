@@ -31,12 +31,12 @@ void VtlStateConverter::init(rclcpp::Node* node)
 
   // Subscription
   state_sub_ = node->create_subscription<InputStateArr>(
-    "/v2i/infrastructure_states", 1,
+    "~/input/infrastructure_states", 1,
     std::bind(&VtlStateConverter::onState, this, _1),
     subscriber_option);
   // Publisher
   state_pub_ = node->create_publisher<OutputStateArr>(
-    "/system/v2x/virtual_traffic_light_states",
+    "~/output/infrastructure_states",
     rclcpp::QoS{1});
 }
 

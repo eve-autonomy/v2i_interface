@@ -37,7 +37,7 @@ void VtlCommandConverter::init(rclcpp::Node* node)
 
   // Subscription
   command_sub_ = node->create_subscription<MainInputCommandArr>(
-    "/awapi/tmp/infrastructure_commands", 1,
+    "~/input/infrastructure_commands", 1,
     std::bind(&VtlCommandConverter::onCommand, this, _1),
     subscriber_option);
   state_sub_ = node->create_subscription<SubInputState>(
@@ -46,7 +46,7 @@ void VtlCommandConverter::init(rclcpp::Node* node)
     subscriber_option);
   // Publisher
   command_pub_ = node->create_publisher<MainOutputCommandArr>(
-    "/v2i/infrastructure_commands",
+    "~/output/infrastructure_commands",
     rclcpp::QoS{1});
 }
 
