@@ -44,6 +44,8 @@ array_settings_list["eva_beacon_system:ref:permit_state"]="INFRA_PERMIT_STATE"
 array_settings_list["eva_beacon_system:ref:request_bit"]="INFRA_REQUEST_BIT"
 array_settings_list["eva_beacon_system:ref:expect_bit"]="INFRA_EXPECT_BIT"
 array_settings_list["turn_direction"]="LANELET_TURN_DIRECTION"
+array_settings_list["subtype"]="LANELET_SUBTYPE"
+array_settings_list["lane_id"]="LANELET_LANE_ID"
 custom_tags=`getJsonFromKeyValueArraySettingsList ${array_settings_list}`
 unset array_settings_list
 
