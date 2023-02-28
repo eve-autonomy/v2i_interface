@@ -35,7 +35,6 @@ source `ros2 pkg prefix v2i_tester`/lib/v2i_tester/generate_json_body.bash
 
 # create keyvalue msg json body
 declare -A array_settings_list=()
-array_settings_list["type"]="VTL_TYPE"
 array_settings_list["eva_beacon_system:id"]="INFRA_ID"
 array_settings_list["eva_beacon_system:ref:mode"]="INFRA_MODE"
 array_settings_list["eva_beacon_system:ref:response_type"]="INFRA_RESPONSE_TYPE"
