@@ -90,7 +90,7 @@ bool EveVTLInterfaceConverter::init(const InfrastructureCommand& input_command)
   // id, modeが適切に設定されてなければ初期化失敗
   // 成功時はattribute変数にidとmodeを代入する
   std::shared_ptr<EveVTLAttr> attr(new EveVTLAttr);
-  attr->setType(tags.at(eve_vtl_spec::KEY_TYPE));
+  attr->setType(type);
   if (tags.find(aw_lanelet_spec::KEY_TURN_DIRECTION) != tags.end()) {
     attr->setTurnDirection(tags.at(aw_lanelet_spec::KEY_TURN_DIRECTION));
   }
