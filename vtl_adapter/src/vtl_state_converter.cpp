@@ -86,7 +86,7 @@ std::optional<OutputStateArr>
     OutputState output_state;
     output_state.stamp = msg->stamp;
     output_state.type = attr->type();
-    output_state.id = attr->id().value();
+    output_state.id = converter->command().id;
     output_state.approval = converter->response(state.state);
     output_state.is_finalized = true;
     output_state_arr.states.emplace_back(output_state);
