@@ -94,6 +94,9 @@ std::optional<MainOutputCommandArr> VtlCommandConverter::requestCommand(
   const std::shared_ptr<InterfaceConverterMap>& converter_array) const
 {
   MainOutputCommandArr command_array;
+  if (!converter_array) {
+    return std::nullopt;
+  }
   for (const auto& elem : *converter_array) {
     const auto& id = elem.first;
     const auto& converter = elem.second;
