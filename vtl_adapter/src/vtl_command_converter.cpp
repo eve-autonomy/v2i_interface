@@ -78,6 +78,9 @@ std::shared_ptr<InterfaceConverterMap> VtlCommandConverter::createConverter(
   std::shared_ptr<InterfaceConverterMap> converter_array(new InterfaceConverterMap());
   for (const auto& orig_elem : original_command->commands) {
     const auto converter(new InterfaceConverter(orig_elem));
+    if (!converter->vtlAttribute()) {
+      continue;
+    }
     const auto id_opt = converter->vtlAttribute()->id();
     if (!id_opt) {
       continue;
