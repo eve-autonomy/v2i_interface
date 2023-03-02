@@ -187,6 +187,11 @@ const std::string& EveVTLAttr::type() const
   return type_;
 }
 
+const std::optional<uint8_t>& EveVTLAttr::expectBit() const
+{
+  return expect_bit_;
+}
+
 const std::optional<std::string>& EveVTLAttr::permitState() const
 {
   return permit_state_;
@@ -235,6 +240,14 @@ bool EveVTLAttr::response(const uint8_t& response_bit) const
     (false);
 }
 
+bool EveVTLAttr::isSelfApproval() const
+{
+  if (!isValidAttr()) {
+    return false;
+  }
+  const auto type = response_type_.value();
+  return (type == VALUE_RESPONSE_TYPE_ALWAYS);
+}
 /*
 *************************************************************
   Class private function

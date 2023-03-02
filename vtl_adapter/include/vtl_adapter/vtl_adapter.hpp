@@ -17,11 +17,13 @@
 
 #include "vtl_adapter/vtl_command_converter.hpp"
 #include "vtl_adapter/vtl_state_converter.hpp"
+#include "vtl_adapter/self_approval_timer.hpp"
 
 namespace vtl_adapter
 {
 using VtlCommandConverter = vtl_command_converter::VtlCommandConverter;
 using VtlStateConverter = vtl_state_converter::VtlStateConverter;
+using SelfApprovalTimer = self_approval_timer::SelfApprovalTimer;
 
 class VtlAdapterNode : public rclcpp::Node
 {
@@ -33,6 +35,9 @@ private:
   
   // state converter
   VtlStateConverter state_converter_;
+
+  // self approval timer
+  SelfApprovalTimer self_approval_timer_;
 };
 
 }  // namespace vtl_adapter

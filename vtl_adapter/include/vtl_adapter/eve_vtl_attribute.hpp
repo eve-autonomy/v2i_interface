@@ -41,11 +41,13 @@ public:
   bool isValidAttr() const;
   const std::optional<uint8_t>& id() const;
   const std::string& type() const;
+  const std::optional<uint8_t>& expectBit() const;
   const std::optional<std::string>& permitState() const;
   std::optional<uint8_t> request(
     const std::string& infra_cmd,
     const std::optional<std::string>& ad_state) const;
   bool response(const uint8_t& response_bit) const;
+  bool isSelfApproval() const;
 
 private:
   bool isValidID(const uint8_t& id) const;
