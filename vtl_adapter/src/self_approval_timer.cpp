@@ -28,15 +28,15 @@ void SelfApprovalTimer::init(rclcpp::Node* node)
   rate = node->declare_parameter<double>("timer_rate", 10.0);
 
   using namespace std::placeholders;
-  auto group = node->create_callback_group(
+  group_ = node->create_callback_group(
     rclcpp::CallbackGroupType::MutuallyExclusive);
   auto subscriber_option = rclcpp::SubscriptionOptions();
-  subscriber_option.callback_group = group;
+  subscriber_option.callback_group = group_;
 
   // Timer
   publish_timer_ = create_timer(node, node->get_clock(),
     rclcpp::Rate(rate).period(), std::bind(&SelfApprovalTimer::onTimer, this),
-    group);
+    group_);
   
   // Publisher
   state_pub_ = node->create_publisher<InputStateArr>(

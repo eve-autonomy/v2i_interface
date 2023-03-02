@@ -16,7 +16,7 @@
 #define VTL_ADAPTER__SELF_APPROVAL_TIMER_HPP_
 
 #include "rclcpp/rclcpp.hpp"
-#include "rclcpp/logger.hpp"
+#include "rclcpp/callback_group.hpp"
 
 // input and output
 #include "v2i_interface_msgs/msg/infrastructure_state_array.hpp"
@@ -52,6 +52,7 @@ private:
   std::shared_ptr<IFConverterDataPipeline> converter_pipeline_;
 
   rclcpp::Node* node_;
+  rclcpp::CallbackGroup::SharedPtr group_;
 };
 
 }  // namespace self_approval_timer
