@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License
 
+#include <unordered_set>
 #include "vtl_adapter/self_approval_timer.hpp"
 #include "vtl_adapter/interface_converter_data_pipeline.hpp"
 
@@ -81,6 +82,7 @@ std::optional<InputStateArr> SelfApprovalTimer::createState()
 
   InputStateArr self_input_state_arr;
   self_input_state_arr.stamp = rclcpp::Clock(RCL_ROS_TIME).now();
+  std::unordered_set<uint8_t> id_set;
   for (const auto& elem : *converter_map) {
     const auto& converter = elem.second;
     const auto& attr = converter->vtlAttribute();
@@ -93,9 +95,15 @@ std::optional<InputStateArr> SelfApprovalTimer::createState()
     else if (!attr->isSelfApproval()) {
       continue;
     }
+
+    const uint8_t id = attr->id().value();
+    if (id_set.find(id) != id_set.end()) {
+      continue;
+    }
+    id_set.emplace(id);
     InputState self_input_state;
     self_input_state.stamp = self_input_state_arr.stamp;
-    self_input_state.id = attr->id().value();
+    self_input_state.id = id;
     self_input_state.state = attr->expectBit().value();
     self_input_state_arr.states.emplace_back(self_input_state);
   }
