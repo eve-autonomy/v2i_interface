@@ -78,6 +78,9 @@ std::shared_ptr<InterfaceConverterMultiMap> VtlCommandConverter::createConverter
   std::shared_ptr<InterfaceConverterMultiMap>
     converter_multimap(new InterfaceConverterMultiMap());
   for (const auto& orig_elem : original_command->commands) {
+    if (orig_elem.state == MainInputCommand::NONE) {
+      continue;
+    }
     const auto converter(new InterfaceConverter(orig_elem));
     if (!converter->vtlAttribute()) {
       continue;

@@ -32,6 +32,7 @@ namespace vtl_command_converter
 {
 
 using MainInputCommandArr = tier4_v2x_msgs::msg::InfrastructureCommandArray;
+using MainInputCommand = tier4_v2x_msgs::msg::InfrastructureCommand;
 using MainOutputCommandArr = v2i_interface_msgs::msg::InfrastructureCommandArray;
 using MainOutputCommand = v2i_interface_msgs::msg::InfrastructureCommand;
 using InterfaceConverter = eve_vtl_interface_converter::EveVTLInterfaceConverter;
