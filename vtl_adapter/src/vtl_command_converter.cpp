@@ -128,6 +128,7 @@ std::optional<MainOutputCommandArr> VtlCommandConverter::requestCommand(
   if (command_array.commands.empty()) {
     return std::nullopt;
   }
+  command_array.stamp =  rclcpp::Clock(RCL_ROS_TIME).now();
   return command_array;
 }
 
