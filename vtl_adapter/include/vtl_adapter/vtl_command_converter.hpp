@@ -32,12 +32,15 @@ namespace vtl_command_converter
 {
 
 using MainInputCommandArr = tier4_v2x_msgs::msg::InfrastructureCommandArray;
+using MainInputCommand = tier4_v2x_msgs::msg::InfrastructureCommand;
 using MainOutputCommandArr = v2i_interface_msgs::msg::InfrastructureCommandArray;
 using MainOutputCommand = v2i_interface_msgs::msg::InfrastructureCommand;
 using InterfaceConverter = eve_vtl_interface_converter::EveVTLInterfaceConverter;
 
 using SubInputState = autoware_state_machine_msgs::msg::StateMachine;
 
+using InterfaceConverterMultiMap =
+  std::unordered_multimap<uint8_t, std::shared_ptr<InterfaceConverter>>;
 using InterfaceConverterMap =
   std::unordered_map<uint8_t, std::shared_ptr<InterfaceConverter>>;
 using IFConverterDataPipeline =
@@ -64,10 +67,10 @@ private:
   void onState(const SubInputState::ConstSharedPtr msg);
 
   // Preprocess
-  std::shared_ptr<InterfaceConverterMap> createConverter(
+  std::shared_ptr<InterfaceConverterMultiMap> createConverter(
     const MainInputCommandArr::ConstSharedPtr& original_command) const;
   std::optional<MainOutputCommandArr> requestCommand(
-    const std::shared_ptr<InterfaceConverterMap>& converter_array) const;
+    const std::shared_ptr<InterfaceConverterMultiMap>& converter_multimap) const;
 
   //member variables
   SubInputState::ConstSharedPtr state_;

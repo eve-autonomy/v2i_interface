@@ -58,13 +58,13 @@ std::shared_ptr<IFConverterDataPipeline> VtlCommandConverter::converterPipeline(
 
 void VtlCommandConverter::onCommand(const MainInputCommandArr::ConstSharedPtr msg)
 {
-  const auto converter_map = createConverter(msg);
-  const auto output_command = requestCommand(converter_map);
+  const auto converter_multimap = createConverter(msg);
+  const auto output_command = requestCommand(converter_multimap);
   if (!output_command) {
     return;
   }
   command_pub_->publish(output_command.value());
-  converter_pipeline_->add(converter_map);
+  converter_pipeline_->add(converter_multimap);
 }
 
 void VtlCommandConverter::onState(const SubInputState::ConstSharedPtr msg)
@@ -72,30 +72,44 @@ void VtlCommandConverter::onState(const SubInputState::ConstSharedPtr msg)
   state_ = msg;
 }
 
-std::shared_ptr<InterfaceConverterMap> VtlCommandConverter::createConverter(
+std::shared_ptr<InterfaceConverterMultiMap> VtlCommandConverter::createConverter(
     const MainInputCommandArr::ConstSharedPtr& original_command) const
 {
-  std::shared_ptr<InterfaceConverterMap> converter_array(new InterfaceConverterMap());
+  std::shared_ptr<InterfaceConverterMultiMap>
+    converter_multimap(new InterfaceConverterMultiMap());
   for (const auto& orig_elem : original_command->commands) {
+    if (orig_elem.state == MainInputCommand::NONE) {
+      continue;
+    }
     const auto converter(new InterfaceConverter(orig_elem));
+    if (!converter->vtlAttribute()) {
+      continue;
+    }
     const auto id_opt = converter->vtlAttribute()->id();
     if (!id_opt) {
       continue;
     }
-    converter_array->emplace(id_opt.value(), converter);
+    converter_multimap->emplace(id_opt.value(), converter);
   }
-  return converter_array;
+  return converter_multimap;
 }
 
 std::optional<MainOutputCommandArr> VtlCommandConverter::requestCommand(
-  const std::shared_ptr<InterfaceConverterMap>& converter_array) const
+  const std::shared_ptr<InterfaceConverterMultiMap>& converter_multimap) const
 {
-  MainOutputCommandArr command_array;
-  for (const auto& elem : *converter_array) {
-    const auto& id = elem.first;
-    const auto& converter = elem.second;
+  if (!converter_multimap) {
+    return std::nullopt;
+  }
+  std::unordered_map<uint8_t, MainOutputCommand> command_map;
+  for (const auto& [id, converter] : *converter_multimap) {
     const auto& req = converter->request(state_);
     if (!req) {
+      continue;
+    }
+    if (command_map.find(id) != command_map.end()) {
+      // If the same ID is found, the value is calculated by OR.
+      // This is because the value is applied to multiple gpio signals.
+      command_map.at(id).state |= req.value();
       continue;
     }
     MainOutputCommand command;
@@ -104,11 +118,17 @@ std::optional<MainOutputCommandArr> VtlCommandConverter::requestCommand(
       command.id = id;
       command.state = req.value();
     }
+    command_map.emplace(id, command);
+  }
+
+  MainOutputCommandArr command_array;
+  for (const auto& [id, command] : command_map) {
     command_array.commands.emplace_back(command);
   }
   if (command_array.commands.empty()) {
     return std::nullopt;
   }
+  command_array.stamp =  rclcpp::Clock(RCL_ROS_TIME).now();
   return command_array;
 }
 

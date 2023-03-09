@@ -68,28 +68,31 @@ void VtlStateConverter::onState(const InputStateArr::ConstSharedPtr msg)
 std::optional<OutputStateArr>
   VtlStateConverter::createState(const InputStateArr::ConstSharedPtr& msg)
 {
-  const auto converter_map = converter_pipeline_->load();
+  const auto converter_multimap = converter_pipeline_->load();
   OutputStateArr output_state_arr;
   output_state_arr.stamp = msg->stamp;
   for (const auto& state : msg->states) {
-    if (converter_map->count(state.id) < 1) {
+    if (converter_multimap->count(state.id) < 1) {
       continue;
     }
-    const auto& converter = converter_map->at(state.id);
-    const auto& attr = converter->vtlAttribute();
-    if (!attr) {
-      continue;
+    auto range = converter_multimap->equal_range(state.id);
+    for (auto it = range.first; it != range.second; ++it) {
+      const auto& converter = it->second;
+      const auto& attr = converter->vtlAttribute();
+      if (!attr) {
+        continue;
+      }
+      else if (!attr->isValidAttr()) {
+        continue;
+      }
+      OutputState output_state;
+      output_state.stamp = msg->stamp;
+      output_state.type = attr->type();
+      output_state.id = converter->command().id;
+      output_state.approval = converter->response(state.state);
+      output_state.is_finalized = true;
+      output_state_arr.states.emplace_back(output_state);
     }
-    else if (!attr->isValidAttr()) {
-      continue;
-    }
-    OutputState output_state;
-    output_state.stamp = msg->stamp;
-    output_state.type = attr->type();
-    output_state.id = converter->command().id;
-    output_state.approval = converter->response(state.state);
-    output_state.is_finalized = true;
-    output_state_arr.states.emplace_back(output_state);
   }
   if (output_state_arr.states.empty()) {
     return std::nullopt;

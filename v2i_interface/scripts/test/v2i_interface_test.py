@@ -212,8 +212,7 @@ class V2iInterfaceTest(Node):
             [sg.Output(size=(680, 100))],
         ]
 
-        window = sg.Window(
-            title='dummy_infrastructure', size=(700, 700)).Layout(layout)
+        window = sg.Window(title='dummy_infrastructure',layout=layout,size=(700, 700),finalize=True)
         self.run()
 
     def __del__(self):

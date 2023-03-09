@@ -16,11 +16,14 @@
 #define VTL_ADAPTER__INTERFACE_CONVERTER_DATA_PIPELINE_HPP_
 
 #include <mutex>
+#include <unordered_map>
 #include "vtl_adapter/eve_vtl_interface_converter.hpp"
 
 namespace interface_converter_data_pipeline
 {
 using InterfaceConverter = eve_vtl_interface_converter::EveVTLInterfaceConverter;
+using InterfaceConverterMultiMap =
+  std::unordered_multimap<uint8_t, std::shared_ptr<InterfaceConverter>>;
 using InterfaceConverterMap =
   std::unordered_map<uint8_t, std::shared_ptr<InterfaceConverter>>;
 
@@ -28,10 +31,10 @@ class IFConverterDataPipeline
 {
 public:
   IFConverterDataPipeline();
-  void add(const std::shared_ptr<InterfaceConverterMap> input);
-  std::shared_ptr<InterfaceConverterMap> load();
+  void add(const std::shared_ptr<InterfaceConverterMultiMap> input);
+  std::shared_ptr<InterfaceConverterMultiMap> load();
 private:
-  std::shared_ptr<InterfaceConverterMap> converter_map_;
+  std::shared_ptr<InterfaceConverterMultiMap> converter_multimap_;
   std::mutex mutex_;
 };
 

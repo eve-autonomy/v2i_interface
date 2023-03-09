@@ -20,21 +20,31 @@ namespace interface_converter_data_pipeline
 IFConverterDataPipeline::IFConverterDataPipeline()
 {}
 
-void IFConverterDataPipeline::add(const std::shared_ptr<InterfaceConverterMap> input)
+void IFConverterDataPipeline::add(const std::shared_ptr<InterfaceConverterMultiMap> input)
 {
   std::lock_guard<std::mutex> lock(mutex_);
-  if (!converter_map_) {
-    converter_map_ = input;
+  if (!converter_multimap_) {
+    converter_multimap_ = input;
     return;
   }
-  input->merge(*converter_map_);
-  converter_map_->swap(*input);
+  for (const auto & [key, value] : *input) {
+    auto range = converter_multimap_->equal_range(key);
+    auto way_id_search_result = std::find_if(range.first, range.second, [&value](const auto & pair) {
+      return pair.second->command().id == value->command().id;
+    });
+    if (way_id_search_result != range.second) {
+      way_id_search_result->second = value;
+    }
+    else {
+      converter_multimap_->insert({key, value});
+    }
+  }
 }
 
-std::shared_ptr<InterfaceConverterMap> IFConverterDataPipeline::load()
+std::shared_ptr<InterfaceConverterMultiMap> IFConverterDataPipeline::load()
 {
   std::lock_guard<std::mutex> lock(mutex_);
-  return converter_map_;
+  return converter_multimap_;
 }
 
 }  // namespace interface_converter_data_pipeline
