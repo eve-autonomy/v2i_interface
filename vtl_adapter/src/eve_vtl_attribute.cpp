@@ -86,7 +86,7 @@ bool EveVTLAttr::setID(const std::string& id_str)
   if (!id_) {
     return false;
   }
-  return !isValidID(id_.value());
+  return isValidID(id_.value());
 }
 
 bool EveVTLAttr::setMode(const std::string& mode)
