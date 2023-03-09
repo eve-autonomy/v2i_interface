@@ -30,6 +30,7 @@ void VtlCommandConverter::init(rclcpp::Node* node)
   }
   using namespace std::placeholders;
 
+  node_ = node;
   auto group = node->create_callback_group(
     rclcpp::CallbackGroupType::MutuallyExclusive);
   auto subscriber_option = rclcpp::SubscriptionOptions();
@@ -48,6 +49,9 @@ void VtlCommandConverter::init(rclcpp::Node* node)
   command_pub_ = node->create_publisher<MainOutputCommandArr>(
     "~/output/infrastructure_commands",
     rclcpp::QoS{1});
+
+  RCLCPP_INFO(node_->get_logger(),
+    "VtlCommandConverter: initialized.");
 }
 
 
@@ -61,6 +65,8 @@ void VtlCommandConverter::onCommand(const MainInputCommandArr::ConstSharedPtr ms
   const auto converter_multimap = createConverter(msg);
   const auto output_command = requestCommand(converter_multimap);
   if (!output_command) {
+    RCLCPP_DEBUG(node_->get_logger(),
+      "VtlCommandConverter: failed to request command.");
     return;
   }
   command_pub_->publish(output_command.value());
@@ -79,17 +85,27 @@ std::shared_ptr<InterfaceConverterMultiMap> VtlCommandConverter::createConverter
     converter_multimap(new InterfaceConverterMultiMap());
   for (const auto& orig_elem : original_command->commands) {
     if (orig_elem.state == MainInputCommand::NONE) {
+      RCLCPP_DEBUG(node_->get_logger(),
+        "VtlCommandConverter:%s: ignore command::NONE.", __func__);
       continue;
     }
-    const auto converter(new InterfaceConverter(orig_elem));
+    const auto converter(new InterfaceConverter(orig_elem, node_));
     if (!converter->vtlAttribute()) {
+      RCLCPP_DEBUG(node_->get_logger(),
+        "VtlCommandConverter:%s: invalid vtl attribute.", __func__);
       continue;
     }
     const auto id_opt = converter->vtlAttribute()->id();
     if (!id_opt) {
+      RCLCPP_DEBUG(node_->get_logger(),
+        "VtlCommandConverter:%s: id initialization failed.", __func__);
       continue;
     }
     converter_multimap->emplace(id_opt.value(), converter);
+  }
+  if (converter_multimap->empty()) {
+    RCLCPP_DEBUG(node_->get_logger(),
+      "VtlCommandConverter: failed to create converter.");
   }
   return converter_multimap;
 }
@@ -104,12 +120,16 @@ std::optional<MainOutputCommandArr> VtlCommandConverter::requestCommand(
   for (const auto& [id, converter] : *converter_multimap) {
     const auto& req = converter->request(state_);
     if (!req) {
+      RCLCPP_DEBUG(node_->get_logger(),
+        "VtlCommandConverter:%s: failed to request (id=%d).", __func__, id);
       continue;
     }
     if (command_map.find(id) != command_map.end()) {
       // If the same ID is found, the value is calculated by OR.
       // This is because the value is applied to multiple gpio signals.
       command_map.at(id).state |= req.value();
+      RCLCPP_DEBUG(node_->get_logger(),
+        "VtlCommandConverter:%s: calculate OR (id=%d).", __func__, id);
       continue;
     }
     MainOutputCommand command;
@@ -118,6 +138,8 @@ std::optional<MainOutputCommandArr> VtlCommandConverter::requestCommand(
       command.id = id;
       command.state = req.value();
     }
+    RCLCPP_DEBUG(node_->get_logger(),
+      "VtlCommandConverter:%s: add command (id=%d).", __func__, id);
     command_map.emplace(id, command);
   }
 
@@ -126,6 +148,8 @@ std::optional<MainOutputCommandArr> VtlCommandConverter::requestCommand(
     command_array.commands.emplace_back(command);
   }
   if (command_array.commands.empty()) {
+    RCLCPP_DEBUG(node_->get_logger(),
+      "VtlCommandConverter:%s: failed to request command.", __func__);
     return std::nullopt;
   }
   command_array.stamp =  rclcpp::Clock(RCL_ROS_TIME).now();

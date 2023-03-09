@@ -18,12 +18,16 @@
 namespace vtl_state_converter
 {
 
+constexpr static unsigned int ERROR_THROTTLE_MSEC = 1000;
+
 void VtlStateConverter::init(rclcpp::Node* node)
 {
   if (!node) {
     return;
   }
   using namespace std::placeholders;
+
+  node_ = node;
   auto group = node->create_callback_group(
     rclcpp::CallbackGroupType::MutuallyExclusive);
   auto subscriber_option = rclcpp::SubscriptionOptions();
@@ -38,6 +42,8 @@ void VtlStateConverter::init(rclcpp::Node* node)
   state_pub_ = node->create_publisher<OutputStateArr>(
     "~/output/infrastructure_states",
     rclcpp::QoS{1});
+  RCLCPP_INFO(node_->get_logger(),
+    "VtlStateConverter: initialized.");
 }
 
 bool VtlStateConverter::acceptConverterPipeline(
@@ -47,19 +53,30 @@ bool VtlStateConverter::acceptConverterPipeline(
     return false;
   }
   converter_pipeline_ = converter_pipeline;
+  RCLCPP_INFO(
+    node_->get_logger(),
+    "VtlStateConverter: converter pipeline is accepted.");
   return true;
 }
 
 void VtlStateConverter::onState(const InputStateArr::ConstSharedPtr msg)
 {
   if (!converter_pipeline_) {
+    RCLCPP_WARN_THROTTLE(
+      node_->get_logger(), *node_->get_clock(), ERROR_THROTTLE_MSEC,
+      "VtlStateConverter:%s: converter pipeline is not set.", __func__);
     return;
   }
   else if (!converter_pipeline_->load()) {
+    RCLCPP_DEBUG(
+      node_->get_logger(),
+      "VtlStateConverter:%s: converter pipeline is not loaded.", __func__);
     return;
   }
   const auto output_state = createState(msg);
   if (!output_state) {
+    RCLCPP_DEBUG(node_->get_logger(),
+      "VtlStateConverter:%s: no valid state is found.", __func__);
     return;
   }
   state_pub_->publish(output_state.value());
@@ -73,6 +90,9 @@ std::optional<OutputStateArr>
   output_state_arr.stamp = msg->stamp;
   for (const auto& state : msg->states) {
     if (converter_multimap->count(state.id) < 1) {
+      RCLCPP_DEBUG(node_->get_logger(),
+        "VtlStateConverter:%s: no converter is found for id:%d.",
+        __func__, state.id);
       continue;
     }
     auto range = converter_multimap->equal_range(state.id);
@@ -80,9 +100,15 @@ std::optional<OutputStateArr>
       const auto& converter = it->second;
       const auto& attr = converter->vtlAttribute();
       if (!attr) {
+        RCLCPP_DEBUG(node_->get_logger(),
+          "VtlStateConverter:%s: no attribute is found for id:%d.",
+          __func__, state.id);
         continue;
       }
       else if (!attr->isValidAttr()) {
+        RCLCPP_DEBUG(node_->get_logger(),
+          "VtlStateConverter:%s: invalid attribute is found for id:%d.",
+          __func__, state.id);
         continue;
       }
       OutputState output_state;
@@ -95,6 +121,8 @@ std::optional<OutputStateArr>
     }
   }
   if (output_state_arr.states.empty()) {
+    RCLCPP_DEBUG(node_->get_logger(),
+      "VtlStateConverter:%s: no valid state is found.", __func__);
     return std::nullopt;
   }
   return output_state_arr;

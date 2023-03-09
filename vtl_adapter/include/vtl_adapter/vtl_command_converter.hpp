@@ -53,6 +53,7 @@ public:
   void init(rclcpp::Node* node);
   std::shared_ptr<IFConverterDataPipeline> converterPipeline();
 private:
+  // Node
   rclcpp::Node* node_;
 
   // Publisher

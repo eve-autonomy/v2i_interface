@@ -19,6 +19,8 @@
 namespace self_approval_timer
 {
 
+constexpr static unsigned int ERROR_THROTTLE_MSEC = 1000;
+
 void SelfApprovalTimer::init(rclcpp::Node* node)
 {
   if (!node) {
@@ -43,6 +45,9 @@ void SelfApprovalTimer::init(rclcpp::Node* node)
   state_pub_ = node->create_publisher<InputStateArr>(
     "~/input/infrastructure_states",
     rclcpp::QoS{1});
+
+  RCLCPP_INFO(node_->get_logger(),
+    "SelfApprovalTimer: initialized.");
 }
 
 bool SelfApprovalTimer::acceptConverterPipeline(
@@ -52,19 +57,30 @@ bool SelfApprovalTimer::acceptConverterPipeline(
     return false;
   }
   converter_pipeline_ = converter_pipeline;
+  RCLCPP_INFO(
+    node_->get_logger(),
+    "SelfApprovalTimer: converter pipeline is accepted.");
   return true;
 }
 
 void SelfApprovalTimer::onTimer()
 {
   if (!converter_pipeline_) {
+    RCLCPP_WARN_THROTTLE(
+      node_->get_logger(), *node_->get_clock(), ERROR_THROTTLE_MSEC,
+      "SelfApprovalTimer:%s: converter pipeline is not set.", __func__);
     return;
   }
   else if (!converter_pipeline_->load()) {
+    RCLCPP_DEBUG(node_->get_logger(),
+      "SelfApprovalTimer:%s: converter pipeline is not loaded.", __func__);
     return;
   }
   const auto self_input_state = createState();
   if (!self_input_state) {
+    RCLCPP_WARN_THROTTLE(
+      node_->get_logger(), *node_->get_clock(), ERROR_THROTTLE_MSEC,
+      "SelfApprovalTimer:%s: self input state is not created.", __func__);
     return;
   }
   state_pub_->publish(self_input_state.value());
@@ -74,9 +90,15 @@ std::optional<InputStateArr> SelfApprovalTimer::createState()
 {
   const auto converter_map = converter_pipeline_->load();
   if (!converter_map) {
+    RCLCPP_WARN_THROTTLE(
+      node_->get_logger(), *node_->get_clock(), ERROR_THROTTLE_MSEC,
+      "SelfApprovalTimer:%s: converter map is not loaded.", __func__);
     return std::nullopt;
   }
   else if (converter_map->empty()) {
+    RCLCPP_WARN_THROTTLE(
+      node_->get_logger(), *node_->get_clock(), ERROR_THROTTLE_MSEC,
+      "SelfApprovalTimer:%s: converter map is empty.", __func__);
     return std::nullopt;
   }
 
@@ -87,12 +109,21 @@ std::optional<InputStateArr> SelfApprovalTimer::createState()
     const auto& converter = elem.second;
     const auto& attr = converter->vtlAttribute();
     if (!attr) {
+      RCLCPP_DEBUG(node_->get_logger(),
+        "SelfApprovalTimer:%s: vtl attribute is not set at id=%d.",
+        __func__, elem.first);
       continue;
     }
     else if (!attr->isValidAttr()) {
+      RCLCPP_DEBUG(node_->get_logger(),
+        "SelfApprovalTimer:%s: vtl attribute is not valid at id=%d.",
+        __func__, elem.first);
       continue;
     }
     else if (!attr->isSelfApproval()) {
+      RCLCPP_DEBUG(node_->get_logger(),
+        "SelfApprovalTimer:%s: vtl attribute is not self approval at id=%d.",
+        __func__, elem.first);
       continue;
     }
 
@@ -108,6 +139,8 @@ std::optional<InputStateArr> SelfApprovalTimer::createState()
     self_input_state_arr.states.emplace_back(self_input_state);
   }
   if (self_input_state_arr.states.empty()) {
+    RCLCPP_DEBUG(node_->get_logger(),
+      "SelfApprovalTimer:%s: self input state is empty.", __func__);
     return std::nullopt;
   }
   return self_input_state_arr;

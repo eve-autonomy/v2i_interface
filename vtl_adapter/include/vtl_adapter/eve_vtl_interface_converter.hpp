@@ -34,7 +34,8 @@ using StateMachine = autoware_state_machine_msgs::msg::StateMachine;
 class EveVTLInterfaceConverter
 {
 public:
-  explicit EveVTLInterfaceConverter(const InfrastructureCommand& input_command);
+  EveVTLInterfaceConverter(
+    const InfrastructureCommand& input_command, rclcpp::Node* node);
 
   const std::shared_ptr<EveVTLAttr>& vtlAttribute() const;
   const InfrastructureCommand& command() const;
@@ -49,6 +50,7 @@ private:
 
   InfrastructureCommand command_;
   std::shared_ptr<EveVTLAttr> vtl_attr_;
+  rclcpp::Node* node_;
 };
 
 }  // namespace eve_vtl_interface_converter

@@ -42,6 +42,9 @@ public:
   bool acceptConverterPipeline(
     std::shared_ptr<IFConverterDataPipeline> converter_pipeline);
 private:
+  // Node
+  rclcpp::Node* node_;
+
   // Publisher
   rclcpp::Publisher<OutputStateArr>::SharedPtr state_pub_;
 
