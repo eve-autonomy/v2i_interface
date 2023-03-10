@@ -113,7 +113,7 @@ bool EveVTLInterfaceConverter::init(const InfrastructureCommand& input_command)
     if (!ret) {
       RCLCPP_WARN_THROTTLE(
         node_->get_logger(), *node_->get_clock(), ERROR_THROTTLE_MSEC,
-        "EveVTLInterfaceConverter::%s: turn_direction is invalid: %s",
+        "EveVTLInterfaceConverter::%s: setTurnDirection calculation failed: input=%s",
         __func__, tags.at(aw_lanelet_spec::KEY_TURN_DIRECTION).c_str());
     }
   }
@@ -129,7 +129,7 @@ bool EveVTLInterfaceConverter::init(const InfrastructureCommand& input_command)
     if (!ret) {
       RCLCPP_WARN_THROTTLE(
         node_->get_logger(), *node_->get_clock(), ERROR_THROTTLE_MSEC,
-        "EveVTLInterfaceConverter::%s: mode is invalid: %s",
+        "EveVTLInterfaceConverter::%s: setMode calculation failed: input=%s",
         __func__, tags.at(eve_vtl_spec::KEY_MODE).c_str());
     }
   }
@@ -145,7 +145,7 @@ bool EveVTLInterfaceConverter::init(const InfrastructureCommand& input_command)
     if (!ret) {
       RCLCPP_WARN_THROTTLE(
         node_->get_logger(), *node_->get_clock(), ERROR_THROTTLE_MSEC,
-        "EveVTLInterfaceConverter::%s: id is invalid: %s",
+        "EveVTLInterfaceConverter::%s: setID calculation failed: input=%s",
         __func__, tags.at(eve_vtl_spec::KEY_ID).c_str());
     }
   }
@@ -161,7 +161,7 @@ bool EveVTLInterfaceConverter::init(const InfrastructureCommand& input_command)
     if (!ret) {
       RCLCPP_WARN_THROTTLE(
         node_->get_logger(), *node_->get_clock(), ERROR_THROTTLE_MSEC,
-        "EveVTLInterfaceConverter::%s: response_type is invalid: %s",
+        "EveVTLInterfaceConverter::%s: setResponseType calculation failed: input=%s",
         __func__, tags.at(eve_vtl_spec::KEY_RESPONSE_TYPE).c_str());
     }
   }
@@ -177,7 +177,7 @@ bool EveVTLInterfaceConverter::init(const InfrastructureCommand& input_command)
     if (!ret) {
       RCLCPP_WARN_THROTTLE(
         node_->get_logger(), *node_->get_clock(), ERROR_THROTTLE_MSEC,
-        "EveVTLInterfaceConverter::%s: request_bit is invalid: %s",
+        "EveVTLInterfaceConverter::%s: setRequestBit calculation failed: input=%s",
         __func__, tags.at(eve_vtl_spec::KEY_REQUEST_BIT).c_str());
     }
   }
@@ -193,7 +193,7 @@ bool EveVTLInterfaceConverter::init(const InfrastructureCommand& input_command)
     if (!ret) {
       RCLCPP_WARN_THROTTLE(
         node_->get_logger(), *node_->get_clock(), ERROR_THROTTLE_MSEC,
-        "EveVTLInterfaceConverter::%s: expect_bit is invalid: %s",
+        "EveVTLInterfaceConverter::%s: setExpectBit calculation failed: input=%s",
         __func__, tags.at(eve_vtl_spec::KEY_EXPECT_BIT).c_str());
     }
   }
@@ -209,7 +209,7 @@ bool EveVTLInterfaceConverter::init(const InfrastructureCommand& input_command)
     if (!ret) {
       RCLCPP_WARN_THROTTLE(
         node_->get_logger(), *node_->get_clock(), ERROR_THROTTLE_MSEC,
-        "EveVTLInterfaceConverter::%s: permit_state is invalid: %s",
+        "EveVTLInterfaceConverter::%s: setPermitState calculation failed: input=%s",
         __func__, tags.at(eve_vtl_spec::KEY_PERMIT_STATE).c_str());
     }
   }
@@ -224,7 +224,7 @@ bool EveVTLInterfaceConverter::init(const InfrastructureCommand& input_command)
     if (!ret) {
       RCLCPP_WARN_THROTTLE(
         node_->get_logger(), *node_->get_clock(), ERROR_THROTTLE_MSEC,
-        "EveVTLInterfaceConverter::%s: section is invalid: %s",
+        "EveVTLInterfaceConverter::%s: setSection calculation failed: input=%s",
         __func__, tags.at(eve_vtl_spec::KEY_SECTION).c_str());
     }
   }
