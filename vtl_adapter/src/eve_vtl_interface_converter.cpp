@@ -273,22 +273,9 @@ std::optional<std::string>
       "EveVTLInterfaceConverter::%s: state is null", __func__);
     return std::nullopt;
   }
-  const auto& ctl_state = state->control_layer_state;
   const auto& srv_state = state->service_layer_state;
   bool is_valid_state = false;
-  if (permit_state == eve_vtl_spec::VALUE_PERMIT_STATE_MANUAL) {
-    is_valid_state = (ctl_state == StateMachine::MANUAL);
-  }
-  else if (permit_state == eve_vtl_spec::VALUE_PERMIT_STATE_EMERGENCY) {
-    is_valid_state = (srv_state == StateMachine::STATE_EMERGENCY_STOP);
-  }
-  else if (permit_state == eve_vtl_spec::VALUE_PERMIT_STATE_ARRIVAL_GOAL) {
-    is_valid_state = (srv_state == StateMachine::STATE_ARRIVED_GOAL);
-  }
-  else if (permit_state == eve_vtl_spec::VALUE_PERMIT_STATE_ENGAGE) {
-    is_valid_state = (srv_state == StateMachine::STATE_INFORM_ENGAGE);
-  }
-  else if (permit_state == eve_vtl_spec::VALUE_PERMIT_STATE_DRIVING) {
+  if (permit_state == eve_vtl_spec::VALUE_PERMIT_STATE_DRIVING) {
     const bool fill_lower_bound = (srv_state >= StateMachine::STATE_RUNNING);
     const bool fill_upper_bound = (srv_state < StateMachine::STATE_ARRIVED_GOAL);
     is_valid_state = (fill_lower_bound && fill_upper_bound);
@@ -301,9 +288,7 @@ std::optional<std::string>
     RCLCPP_WARN_STREAM_THROTTLE(
       node_->get_logger(), *node_->get_clock(), ERROR_THROTTLE_MSEC,
       "EveVTLInterfaceConverter::" << __func__ <<
-      ": state is invalid: " <<
-      "control_layer_state=" << ctl_state <<
-      ", service_layer_state=" << srv_state);
+      ": state is invalid: " << srv_state);
   }
   return (is_valid_state) ? permit_state_opt : std::nullopt;
 }

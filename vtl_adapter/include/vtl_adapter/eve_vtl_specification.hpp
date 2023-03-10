@@ -33,10 +33,6 @@ static const std::string VALUE_SECTION_NULL = "";
 
 static const std::string KEY_PERMIT_STATE = "eva_beacon_system:ref:permit_state";
 static const std::string VALUE_PERMIT_STATE_DRIVING = "DRIVING";
-static const std::string VALUE_PERMIT_STATE_MANUAL = "MANUAL";
-static const std::string VALUE_PERMIT_STATE_EMERGENCY = "EMERGENCY";
-static const std::string VALUE_PERMIT_STATE_ARRIVAL_GOAL = "ARRIVAL_GOAL";
-static const std::string VALUE_PERMIT_STATE_ENGAGE = "ENGAGE";
 static const std::string VALUE_PERMIT_STATE_NULL = "";
 
 static const std::string KEY_REQUEST_BIT = "eva_beacon_system:ref:request_bit";

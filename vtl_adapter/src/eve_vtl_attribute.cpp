@@ -291,10 +291,6 @@ bool EveVTLAttr::isValidState(const std::string& state) const
 {
   return
     (state == VALUE_PERMIT_STATE_DRIVING) ||
-    (state == VALUE_PERMIT_STATE_MANUAL) ||
-    (state == VALUE_PERMIT_STATE_EMERGENCY) ||
-    (state == VALUE_PERMIT_STATE_ARRIVAL_GOAL) ||
-    (state == VALUE_PERMIT_STATE_ENGAGE) ||
     (state == VALUE_PERMIT_STATE_NULL);
 }
 
