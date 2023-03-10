@@ -82,8 +82,8 @@ bool EveVTLInterfaceConverter::init(const InfrastructureCommand& input_command)
   // type == eva_bacon_system以外のときは初期化失敗
   if (type != eve_vtl_spec::VALUE_TYPE) {
     RCLCPP_DEBUG(
-      node_->get_logger(), "EveVTLInterfaceConverter::%s: type is not %s",
-      __func__, eve_vtl_spec::VALUE_TYPE.c_str());
+      node_->get_logger(), "EveVTLInterfaceConverter::%s: type is invalid: %s",
+      __func__, type.c_str());
     return false;
   }
 
@@ -106,24 +106,39 @@ bool EveVTLInterfaceConverter::init(const InfrastructureCommand& input_command)
   // 成功時はattribute変数にidとmodeを代入する
   std::shared_ptr<EveVTLAttr> attr(new EveVTLAttr);
   attr->setType(type);
+
   if (tags.find(aw_lanelet_spec::KEY_TURN_DIRECTION) != tags.end()) {
     const bool ret =
       attr->setTurnDirection(tags.at(aw_lanelet_spec::KEY_TURN_DIRECTION));
     if (!ret) {
       RCLCPP_WARN_THROTTLE(
         node_->get_logger(), *node_->get_clock(), ERROR_THROTTLE_MSEC,
-        "EveVTLInterfaceConverter::%s: turn_direction is invalid", __func__);
+        "EveVTLInterfaceConverter::%s: turn_direction is invalid: %s",
+        __func__, tags.at(aw_lanelet_spec::KEY_TURN_DIRECTION).c_str());
     }
   }
+  else {
+    RCLCPP_WARN_THROTTLE(
+      node_->get_logger(), *node_->get_clock(), ERROR_THROTTLE_MSEC,
+      "EveVTLInterfaceConverter::%s: turn_direction is not set", __func__);
+  }
+
   if (tags.find(eve_vtl_spec::KEY_MODE) != tags.end()) {
     const bool ret =
       attr->setMode(tags.at(eve_vtl_spec::KEY_MODE));
     if (!ret) {
       RCLCPP_WARN_THROTTLE(
         node_->get_logger(), *node_->get_clock(), ERROR_THROTTLE_MSEC,
-        "EveVTLInterfaceConverter::%s: mode is invalid", __func__);
+        "EveVTLInterfaceConverter::%s: mode is invalid: %s",
+        __func__, tags.at(eve_vtl_spec::KEY_MODE).c_str());
     }
   }
+  else {
+    RCLCPP_WARN_THROTTLE(
+      node_->get_logger(), *node_->get_clock(), ERROR_THROTTLE_MSEC,
+      "EveVTLInterfaceConverter::%s: mode is not set", __func__);
+  }
+
   if (tags.find(eve_vtl_spec::KEY_ID) != tags.end()) {
     const bool ret =
       attr->setID(tags.at(eve_vtl_spec::KEY_ID));
@@ -134,59 +149,97 @@ bool EveVTLInterfaceConverter::init(const InfrastructureCommand& input_command)
         __func__, tags.at(eve_vtl_spec::KEY_ID).c_str());
     }
   }
+  else {
+    RCLCPP_WARN_THROTTLE(
+      node_->get_logger(), *node_->get_clock(), ERROR_THROTTLE_MSEC,
+      "EveVTLInterfaceConverter::%s: id is not set", __func__);
+  }
+
   if (tags.find(eve_vtl_spec::KEY_RESPONSE_TYPE) != tags.end()) {
     const bool ret =
       attr->setResponseType(tags.at(eve_vtl_spec::KEY_RESPONSE_TYPE));
     if (!ret) {
       RCLCPP_WARN_THROTTLE(
         node_->get_logger(), *node_->get_clock(), ERROR_THROTTLE_MSEC,
-        "EveVTLInterfaceConverter::%s: response_type is invalid", __func__);
+        "EveVTLInterfaceConverter::%s: response_type is invalid: %s",
+        __func__, tags.at(eve_vtl_spec::KEY_RESPONSE_TYPE).c_str());
     }
   }
+  else {
+    RCLCPP_WARN_THROTTLE(
+      node_->get_logger(), *node_->get_clock(), ERROR_THROTTLE_MSEC,
+      "EveVTLInterfaceConverter::%s: response_type is not set", __func__);
+  }
+
   if (tags.find(eve_vtl_spec::KEY_REQUEST_BIT) != tags.end()) {
     const bool ret =
       attr->setRequestBit(tags.at(eve_vtl_spec::KEY_REQUEST_BIT));
     if (!ret) {
       RCLCPP_WARN_THROTTLE(
         node_->get_logger(), *node_->get_clock(), ERROR_THROTTLE_MSEC,
-        "EveVTLInterfaceConverter::%s: request_bit is invalid", __func__);
+        "EveVTLInterfaceConverter::%s: request_bit is invalid: %s",
+        __func__, tags.at(eve_vtl_spec::KEY_REQUEST_BIT).c_str());
     }
   }
+  else {
+    RCLCPP_WARN_THROTTLE(
+      node_->get_logger(), *node_->get_clock(), ERROR_THROTTLE_MSEC,
+      "EveVTLInterfaceConverter::%s: request_bit is not set", __func__);
+  }
+
   if (tags.find(eve_vtl_spec::KEY_EXPECT_BIT) != tags.end()) {
     const bool ret =
       attr->setExpectBit(tags.at(eve_vtl_spec::KEY_EXPECT_BIT));
     if (!ret) {
       RCLCPP_WARN_THROTTLE(
         node_->get_logger(), *node_->get_clock(), ERROR_THROTTLE_MSEC,
-        "EveVTLInterfaceConverter::%s: expect_bit is invalid", __func__);
+        "EveVTLInterfaceConverter::%s: expect_bit is invalid: %s",
+        __func__, tags.at(eve_vtl_spec::KEY_EXPECT_BIT).c_str());
     }
   }
+  else {
+    RCLCPP_WARN_THROTTLE(
+      node_->get_logger(), *node_->get_clock(), ERROR_THROTTLE_MSEC,
+      "EveVTLInterfaceConverter::%s: expect_bit is not set", __func__);
+  }
+
   if (tags.find(eve_vtl_spec::KEY_PERMIT_STATE) != tags.end()) {
     const bool ret =
       attr->setPermitState(tags.at(eve_vtl_spec::KEY_PERMIT_STATE));
     if (!ret) {
       RCLCPP_WARN_THROTTLE(
         node_->get_logger(), *node_->get_clock(), ERROR_THROTTLE_MSEC,
-        "EveVTLInterfaceConverter::%s: permit_state is invalid", __func__);
+        "EveVTLInterfaceConverter::%s: permit_state is invalid: %s",
+        __func__, tags.at(eve_vtl_spec::KEY_PERMIT_STATE).c_str());
     }
   }
+  else {
+    RCLCPP_DEBUG(node_->get_logger(),
+      "EveVTLInterfaceConverter::%s: permit_state is not set", __func__);
+  }
+
   if (tags.find(eve_vtl_spec::KEY_SECTION) != tags.end()) {
     const bool ret =
       attr->setSection(tags.at(eve_vtl_spec::KEY_SECTION));
     if (!ret) {
       RCLCPP_WARN_THROTTLE(
         node_->get_logger(), *node_->get_clock(), ERROR_THROTTLE_MSEC,
-        "EveVTLInterfaceConverter::%s: section is invalid", __func__);
+        "EveVTLInterfaceConverter::%s: section is invalid: %s",
+        __func__, tags.at(eve_vtl_spec::KEY_SECTION).c_str());
     }
   }
+  else {
+    RCLCPP_DEBUG(node_->get_logger(),
+      "EveVTLInterfaceConverter::%s: section is not set", __func__);
+  }
+
   if (attr->isValidAttr()) {
     vtl_attr_ = attr;
     return true;
   }
-  RCLCPP_WARN_STREAM_THROTTLE(
+  RCLCPP_WARN_THROTTLE(
     node_->get_logger(), *node_->get_clock(), ERROR_THROTTLE_MSEC,
-    "EveVTLInterfaceConverter::" << __func__ <<
-    ": attribute is invalid: " << rosidl_generator_traits::to_yaml(input_command));
+    "EveVTLInterfaceConverter::%s: attribute is invalid", __func__);
   return false;
 }
 
