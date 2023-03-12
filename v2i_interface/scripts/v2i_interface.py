@@ -90,9 +90,11 @@ class V2iInterfaceNode(Node):
     def fin(self):
         self._th_close = True
         del self._udp
+        self.destroy_node()
 
     def recv_loop(self):
         while True:
+            time.sleep(self._udp_recv_interval)
             if(self._th_close):
                 break
             recv_data = self._udp.recv()
@@ -106,8 +108,6 @@ class V2iInterfaceNode(Node):
                 with self.recv_lock:
                     self._recv_array = recv_array
                     self._recv_stamp = self.get_clock().now()
-
-            time.sleep(self._udp_recv_interval)
 
     def on_command_array(self, command_array):
         if(command_array is None):
@@ -144,7 +144,11 @@ class V2iInterfaceNode(Node):
         if(self._request_array is None):
             return
         if(len(self._request_array) > 0):
-            self._udp.send(self._request_array)
+            ret = self._udp.send(self._request_array)
+            if (ret == -1):
+                self._logger.error("send udp error")
+                self.fin()
+                return
             self._logger.info("send udp {0}".format(self._request_array))
 
     def publish_infrastructure_states(self):
@@ -175,7 +179,6 @@ class V2iInterfaceNode(Node):
 
 def shutdown(signal, frame):
     node.fin()
-    node.destroy_node()
     rclpy.shutdown()
 
 def main(args=None):

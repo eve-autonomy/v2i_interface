@@ -24,7 +24,7 @@
 
   <group>
     <push-ros-namespace namespace="v2i_interface"/>
-    <node pkg="v2i_interface" exec="v2i_interface.py" name="v2i_interface" output="screen">
+    <node pkg="v2i_interface" exec="v2i_interface.py" name="v2i_interface" output="screen" respawn="true" respawn_delay="1.0">
       <param from="$(var config_dir)/$(var operation_mode)/v2i_interface.param.yaml" />
       <remap from="~/input/command_array" to="$(var input/command_array)"/>
       <remap from="~/output/state_array" to="$(var output/state_array)"/>
