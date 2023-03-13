@@ -11,7 +11,8 @@
    limitations under the License.
 -->
 <launch>
-  <node pkg="v2i_command_muxer" exec="v2i_command_muxer_node" name="v2i_command_muxer" output="screen">
+  <node pkg="v2i_command_muxer" exec="v2i_command_muxer_node" name="v2i_command_muxer" output="screen" 
+    respawn="true" respawn_delay="3.0">
     <param from="$(find-pkg-share v2i_command_muxer)/config/topic_definition.yaml"/>
   </node>
 </launch>
