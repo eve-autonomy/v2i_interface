@@ -150,9 +150,11 @@ class V2iInterfaceNode(Node):
     def fin(self):
         self._th_close = True
         del self._udp
+        self.destroy_node()
 
     def recv_loop(self):
         while True:
+            time.sleep(self._udp_recv_interval)
             if(self._th_close):
                 break
 
@@ -174,8 +176,6 @@ class V2iInterfaceNode(Node):
                             # Stores values even for reply data
                             #  that is not addressed to my vehicle.
                             self._infra_dict[key].reply_value = reply["gpio"]
-
-            time.sleep(self._udp_recv_interval)
 
     def on_command_array(self, command_array):
         if(command_array is None):
@@ -254,7 +254,11 @@ class V2iInterfaceNode(Node):
 
         # send to infra
         if(request_array_cnt > 0):
-            self._udp.send(request_array)
+            ret = self._udp.send(request_array)
+            if (ret == -1):
+              self._logger.error("send udp error")
+              self.fin()
+              return
             self._logger.info("send udp {0}".format(request_array))
 
         # send to virtual_traffic_light
@@ -385,7 +389,6 @@ class V2iInterfaceNode(Node):
 
 def shutdown(signal, frame):
     node.fin()
-    node.destroy_node()
     rclpy.shutdown()
 
 

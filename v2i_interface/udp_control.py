@@ -51,10 +51,13 @@ class UdpControl:
                 "nanosec": nanosec_time},
             "request_array": request_array}
 
-        self._send_socket.sendto(
-            json.dumps(payload).encode("utf-8"),
-            (self._send_address, self._send_port))
-        self._send_seq_num += 1
+        try:
+          self._send_socket.sendto(
+              json.dumps(payload).encode("utf-8"),
+              (self._send_address, self._send_port))
+          self._send_seq_num += 1
+        except OSError:
+          return -1
 
         return (self._send_seq_num, now_time)
 
