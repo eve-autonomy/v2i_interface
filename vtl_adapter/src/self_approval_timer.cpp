@@ -78,8 +78,7 @@ void SelfApprovalTimer::onTimer()
   }
   const auto self_input_state = createState();
   if (!self_input_state) {
-    RCLCPP_WARN_THROTTLE(
-      node_->get_logger(), *node_->get_clock(), ERROR_THROTTLE_MSEC,
+    RCLCPP_DEBUG(node_->get_logger(),
       "SelfApprovalTimer:%s: self input state is not created.", __func__);
     return;
   }
