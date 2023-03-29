@@ -89,14 +89,12 @@ std::optional<InputStateArr> SelfApprovalTimer::createState()
 {
   const auto converter_map = converter_pipeline_->load();
   if (!converter_map) {
-    RCLCPP_WARN_THROTTLE(
-      node_->get_logger(), *node_->get_clock(), ERROR_THROTTLE_MSEC,
+    RCLCPP_DEBUG(node_->get_logger(),
       "SelfApprovalTimer:%s: converter map is not loaded.", __func__);
     return std::nullopt;
   }
   else if (converter_map->empty()) {
-    RCLCPP_WARN_THROTTLE(
-      node_->get_logger(), *node_->get_clock(), ERROR_THROTTLE_MSEC,
+    RCLCPP_DEBUG(node_->get_logger(),
       "SelfApprovalTimer:%s: converter map is empty.", __func__);
     return std::nullopt;
   }
