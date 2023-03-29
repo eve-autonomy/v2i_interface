@@ -34,6 +34,7 @@ public:
   void add(const std::shared_ptr<InterfaceConverterMultiMap> input);
   std::shared_ptr<InterfaceConverterMultiMap> load();
 private:
+  void refresh();
   std::shared_ptr<InterfaceConverterMultiMap> converter_multimap_;
   std::mutex mutex_;
 };

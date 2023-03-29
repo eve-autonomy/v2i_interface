@@ -17,11 +17,14 @@
 namespace interface_converter_data_pipeline
 {
 
+constexpr double CONVERTER_EXPIRE_SECONDS = 1.0;
+
 IFConverterDataPipeline::IFConverterDataPipeline()
 {}
 
 void IFConverterDataPipeline::add(const std::shared_ptr<InterfaceConverterMultiMap> input)
 {
+  refresh();
   std::lock_guard<std::mutex> lock(mutex_);
   if (!converter_multimap_) {
     converter_multimap_ = input;
@@ -43,8 +46,27 @@ void IFConverterDataPipeline::add(const std::shared_ptr<InterfaceConverterMultiM
 
 std::shared_ptr<InterfaceConverterMultiMap> IFConverterDataPipeline::load()
 {
+  refresh();
   std::lock_guard<std::mutex> lock(mutex_);
   return converter_multimap_;
+}
+
+void IFConverterDataPipeline::refresh()
+{
+  std::lock_guard<std::mutex> lock(mutex_);
+  if (!converter_multimap_) {
+    return;
+  }
+  for (auto it = converter_multimap_->begin(); it != converter_multimap_->end();) {
+    auto& value = it->second;
+    const auto duration = rclcpp::Clock(RCL_ROS_TIME).now() - value->command().stamp;
+    if (duration.seconds() > CONVERTER_EXPIRE_SECONDS) {
+      it = converter_multimap_->erase(it);
+    }
+    else {
+      ++it;
+    }
+  }
 }
 
 }  // namespace interface_converter_data_pipeline
