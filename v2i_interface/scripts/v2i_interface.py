@@ -144,8 +144,7 @@ class V2iInterfaceNode(Node):
             ret = self._udp.send(self._request_array)
             if (ret == -1):
                 self._logger.error("send udp error")
-                self.fin()
-                return
+                raise RuntimeError
 
     def publish_infrastructure_states(self):
         with self.recv_lock:
@@ -182,6 +181,8 @@ def main(args=None):
     except KeyboardInterrupt:
         pass
     except ExternalShutdownException:
+        pass
+    except RuntimeError:
         pass
     finally:
         node.fin()
