@@ -28,7 +28,6 @@ ament_python_install_package(scripts)
 install(
   PROGRAMS
   scripts/v2i_interface.py
-  scripts/test/v2i_interface_test.py
   DESTINATION
   lib/${PROJECT_NAME})
 
