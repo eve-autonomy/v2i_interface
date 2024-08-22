@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # coding: utf-8
-
 # Copyright 2021 eve autonomy inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,45 +13,35 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import signal
 import threading
 import time
 from rclpy.executors import ExternalShutdownException 
 from rclpy.time import Time
-
 from v2i_interface_msgs.msg import (
     InfrastructureCommand, InfrastructureCommandArray,
     InfrastructureState, InfrastructureStateArray
 )
-
 import udp_control
-
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSDurabilityPolicy, QoSProfile
-
 class V2iInterfaceNode(Node):
     recv_lock = threading.Lock()
-
     def __init__(self):
         super().__init__('v2i_interface')
         self._logger = self.get_logger()
-
         timer_period = 0.1
         self._udp_recv_interval = 0.1
-
         self._data_store_timeout_sec = 1.0
-
         ip_address = self.declare_parameter("ip_address", "127.0.0.1")
         send_port = self.declare_parameter("send_port", 0)
         receive_port = self.declare_parameter("receive_port", 0)
         self._ip_address = ip_address.get_parameter_value().string_value
         self._send_port = send_port.get_parameter_value().integer_value
         self._receive_port = receive_port.get_parameter_value().integer_value
-        buffer_size = 4096
-        receive_timeout = 0.5
-
+        self._buffer_size = 4096
+        self._receive_timeout = 0.5
         # QoS Setting
         depth = 1
         cmd_profile = QoSProfile(depth=depth)
@@ -66,29 +55,33 @@ class V2iInterfaceNode(Node):
             InfrastructureStateArray, "~/output/state_array", state_profile)
         # timer
         self._timer = self.create_timer(timer_period, self.output_timer)
-
         # UDP
         self._th_close = False
         self._udp = udp_control.UdpControl(
             self._ip_address,
             self._send_port,
             self._receive_port,
-            receive_timeout,
-            buffer_size)
+            self._receive_timeout,
+            self._buffer_size)
         self._recv_th = threading.Thread(target=self.recv_loop)
         self._recv_th.start()
-
         self._logger.info("initialized")
         self._recv_array = []
         self._recv_stamp = self.get_clock().now()
         self._request_array = []
         self._request_stamp = self.get_clock().now()
-
+    def create_new_udp_control(self):
+        self._udp = udp_control.UdpControl(
+            self._ip_address,
+            self._send_port,
+            self._receive_port,
+            self._receive_timeout,
+            self._buffer_size
+        )
     def fin(self):
         self._th_close = True
         del self._udp
         self.destroy_node()
-
     def recv_loop(self):
         while True:
             time.sleep(self._udp_recv_interval)
@@ -105,7 +98,6 @@ class V2iInterfaceNode(Node):
                 with self.recv_lock:
                     self._recv_array = recv_array
                     self._recv_stamp = self.get_clock().now()
-
     def on_command_array(self, command_array):
         if(command_array is None):
             return
@@ -125,7 +117,6 @@ class V2iInterfaceNode(Node):
             request_array.append(ret_value)
         self._request_array = request_array
         self._request_stamp = self.get_clock().now()
-
     def output_timer(self):
         self.send_udp_command()
         self.publish_infrastructure_states()
@@ -136,16 +127,15 @@ class V2iInterfaceNode(Node):
             if (self._recv_array is not None):
                 if (self.is_timeout(self._recv_stamp)):
                     self._recv_array = []
-
     def send_udp_command(self):
+        self._request_array = [1]
         if(self._request_array is None):
             return
         if(len(self._request_array) > 0):
             ret = self._udp.send(self._request_array)
             if (ret == -1):
                 self._logger.error("send udp error")
-                raise RuntimeError
-
+                raise RuntimeError    
     def publish_infrastructure_states(self):
         with self.recv_lock:
             if (self._recv_array is None):
@@ -162,31 +152,37 @@ class V2iInterfaceNode(Node):
             vtl_state_array.states.append(ret_value)
         vtl_state_array.stamp = stamp
         self._state_array_publisher.publish(vtl_state_array)
-
     def convert_state(self, state : InfrastructureState):
         state.state = state.state >> 4
-
     def is_timeout(self, stamp):
         duration = self.get_clock().now() - stamp
         duration_sec = duration.nanoseconds * 1e-9
         return (duration_sec > self._data_store_timeout_sec)
-
 def main(args=None):
     try:
         global node
         rclpy.init(args=args)
         node = V2iInterfaceNode()
         while rclpy.ok():
-            rclpy.spin(node)
+            try:
+                rclpy.spin(node)
+            except RuntimeError:
+                node._th_close = True
+                node._recv_th.join()
+                del node._udp
+                time.sleep(3)
+                node.create_new_udp_control()
+                node._th_close = False
+                node._recv_th = threading.Thread(target=node.recv_loop)
+                node._recv_th.start()
+                continue
     except KeyboardInterrupt:
         pass
     except ExternalShutdownException:
         pass
-    except RuntimeError:
-        pass
     finally:
         node.fin()
         rclpy.try_shutdown()
-
 if __name__ == '__main__':
     main()
+
