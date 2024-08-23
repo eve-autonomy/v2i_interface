@@ -143,7 +143,7 @@ class V2iInterfaceNode(Node):
             if (self._recv_array is not None):
                 if (self.is_timeout(self._recv_stamp)):
                     self._recv_array = []
-                    
+
     def send_udp_command(self):
         self._request_array = [1]
         if(self._request_array is None):
@@ -152,8 +152,8 @@ class V2iInterfaceNode(Node):
             ret = self._udp.send(self._request_array)
             if (ret == -1):
                 self._logger.error("send udp error")
-                raise RuntimeError    
-            
+                raise RuntimeError
+
     def publish_infrastructure_states(self):
         with self.recv_lock:
             if (self._recv_array is None):
@@ -178,7 +178,7 @@ class V2iInterfaceNode(Node):
         duration = self.get_clock().now() - stamp
         duration_sec = duration.nanoseconds * 1e-9
         return (duration_sec > self._data_store_timeout_sec)
-    
+
 def main(args=None):
     try:
         global node
@@ -204,7 +204,6 @@ def main(args=None):
     finally:
         node.fin()
         rclpy.try_shutdown()
-        
+
 if __name__ == '__main__':
     main()
-
