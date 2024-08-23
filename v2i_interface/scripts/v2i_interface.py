@@ -52,6 +52,7 @@ class V2iInterfaceNode(Node):
         self._receive_port = receive_port.get_parameter_value().integer_value
         self._buffer_size = 4096
         self._receive_timeout = 0.5
+
         # QoS Setting
         depth = 1
         cmd_profile = QoSProfile(depth=depth)
