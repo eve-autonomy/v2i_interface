@@ -204,12 +204,12 @@ def main(args=None):
                 reopen_socket(node)
                 continue
     except KeyboardInterrupt:
-        node._logger.info("keyboradinterrupt")
         pass
     except ExternalShutdownException:
         pass
+    except RuntimeError:
+        pass
     finally:
-        node._logger.info("finalize")
         node.fin()
         rclpy.try_shutdown()
 
