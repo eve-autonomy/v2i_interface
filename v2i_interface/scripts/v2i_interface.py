@@ -183,7 +183,11 @@ class V2iInterfaceNode(Node):
 
 def reopen_socket(node):
     node._th_close = True
-    node._recv_th.join()
+    node._recv_th.join(10)
+    if node._recv_th.is_alive():
+        node.fin()
+        rclpy.try_shutdown()
+        return
     del node._udp
     time.sleep(3)
     node.create_new_udp_control()
