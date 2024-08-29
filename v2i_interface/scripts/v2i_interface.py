@@ -146,7 +146,6 @@ class V2iInterfaceNode(Node):
                     self._recv_array = []
 
     def send_udp_command(self):
-        self._request_array = [1]
         if(self._request_array is None):
             return
         if(len(self._request_array) > 0):
@@ -154,7 +153,6 @@ class V2iInterfaceNode(Node):
             if (ret == -1):
                 self._logger.error("send udp error")
                 raise RuntimeError
-            self._logger.info("send udp {0}".format(self._request_array))
 
     def publish_infrastructure_states(self):
         with self.recv_lock:
