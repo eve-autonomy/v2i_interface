@@ -52,6 +52,8 @@ class V2iInterfaceNode(Node):
         self._receive_port = receive_port.get_parameter_value().integer_value
         self._buffer_size = 4096
         self._receive_timeout = 0.5
+        self._receive_thread_close_timeout = 10
+        self._socket_reopen_interval = 3
 
         # QoS Setting
         depth = 1
@@ -181,13 +183,13 @@ class V2iInterfaceNode(Node):
 
 def reopen_socket(node):
     node._th_close = True
-    node._recv_th.join(10)
+    node._recv_th.join(node._receive_thread_close_timeout)
     if node._recv_th.is_alive():
         node.fin()
         rclpy.try_shutdown()
         return
     del node._udp
-    time.sleep(3)
+    time.sleep(node._socket_reopen_interval)
     node.create_new_udp_control()
     node._th_close = False
     node._recv_th = threading.Thread(target=node.recv_loop)
