@@ -181,20 +181,20 @@ class V2iInterfaceNode(Node):
         duration_sec = duration.nanoseconds * 1e-9
         return (duration_sec > self._data_store_timeout_sec)
 
-def reopen_socket(node):
-    node._th_close = True
-    node._recv_th.join(node._receive_thread_close_timeout)
-    if node._recv_th.is_alive():
-        node.fin()
-        rclpy.try_shutdown()
+    def reopen_socket(node):
+        node._th_close = True
+        node._recv_th.join(node._receive_thread_close_timeout)
+        if node._recv_th.is_alive():
+            node.fin()
+            rclpy.try_shutdown()
+            return
+        del node._udp
+        time.sleep(node._socket_reopen_interval)
+        node.create_new_udp_control()
+        node._th_close = False
+        node._recv_th = threading.Thread(target=node.recv_loop)
+        node._recv_th.start()
         return
-    del node._udp
-    time.sleep(node._socket_reopen_interval)
-    node.create_new_udp_control()
-    node._th_close = False
-    node._recv_th = threading.Thread(target=node.recv_loop)
-    node._recv_th.start()
-    return
 
 def main(args=None):
     try:
