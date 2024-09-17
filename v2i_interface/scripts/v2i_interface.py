@@ -50,8 +50,10 @@ class V2iInterfaceNode(Node):
         self._ip_address = ip_address.get_parameter_value().string_value
         self._send_port = send_port.get_parameter_value().integer_value
         self._receive_port = receive_port.get_parameter_value().integer_value
-        buffer_size = 4096
-        receive_timeout = 0.5
+        self._buffer_size = 4096
+        self._receive_timeout = 0.5
+        self._receive_thread_close_timeout = 10
+        self._socket_reopen_interval = 3
 
         # QoS Setting
         depth = 1
@@ -73,8 +75,8 @@ class V2iInterfaceNode(Node):
             self._ip_address,
             self._send_port,
             self._receive_port,
-            receive_timeout,
-            buffer_size)
+            self._receive_timeout,
+            self._buffer_size)
         self._recv_th = threading.Thread(target=self.recv_loop)
         self._recv_th.start()
 
@@ -84,6 +86,14 @@ class V2iInterfaceNode(Node):
         self._request_array = []
         self._request_stamp = self.get_clock().now()
 
+    def create_new_udp_control(self):
+        self._udp = udp_control.UdpControl(
+            self._ip_address,
+            self._send_port,
+            self._receive_port,
+            self._receive_timeout,
+            self._buffer_size
+        )
     def fin(self):
         self._th_close = True
         del self._udp
@@ -171,13 +181,32 @@ class V2iInterfaceNode(Node):
         duration_sec = duration.nanoseconds * 1e-9
         return (duration_sec > self._data_store_timeout_sec)
 
+    def reopen_socket(node):
+        node._th_close = True
+        node._recv_th.join(node._receive_thread_close_timeout)
+        if node._recv_th.is_alive():
+            node.fin()
+            rclpy.try_shutdown()
+            return
+        del node._udp
+        time.sleep(node._socket_reopen_interval)
+        node.create_new_udp_control()
+        node._th_close = False
+        node._recv_th = threading.Thread(target=node.recv_loop)
+        node._recv_th.start()
+        return
+
 def main(args=None):
     try:
         global node
         rclpy.init(args=args)
         node = V2iInterfaceNode()
         while rclpy.ok():
-            rclpy.spin(node)
+            try:
+                rclpy.spin(node)
+            except RuntimeError:
+                reopen_socket(node)
+                continue
     except KeyboardInterrupt:
         pass
     except ExternalShutdownException:
