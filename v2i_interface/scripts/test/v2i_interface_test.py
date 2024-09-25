@@ -28,7 +28,6 @@ import os
 
 import rclpy
 from rclpy.node import Node
-from rclpy.qos import QoSDurabilityPolicy, QoSProfile
 
 M_SIZE = 4096
 
