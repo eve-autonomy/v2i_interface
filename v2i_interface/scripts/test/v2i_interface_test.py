@@ -218,14 +218,14 @@ class V2iInterfaceTest(Node):
             time.sleep(next_sleep)
 
     def recv_from_v2i_interface(self):
-        global recv_write
+        global is_recv_write
         while True:
             if(self._th_close):
                 break
 
             ret = self._dummy.recv()
             if(ret != -1):
-                recv_write = True
+                is_recv_write = True
                 self._fp_recv.write(', '.join('{}'.format(x) for x in ret))
                 self._fp_recv.write('\n')
             time.sleep(0.1)
@@ -234,7 +234,7 @@ class V2iInterfaceTest(Node):
     def run(self):
         global window
         global is_send_write
-        global recv_write
+        global is_recv_write
         os.makedirs(os.path.dirname(self._recv_output_filename), exist_ok=True)
         os.makedirs(os.path.dirname(self._send_output_filename), exist_ok=True)
 
@@ -248,7 +248,7 @@ class V2iInterfaceTest(Node):
 
         multilne:eg.Multiline = window['-OUTPUT-']
         is_send_write = False
-        recv_write = False
+        is_recv_write = False
 
         while True:
             event, values= window.read(timeout=100)
@@ -274,9 +274,9 @@ class V2iInterfaceTest(Node):
             if is_send_write == True:
                 multilne.print("send write")
                 is_send_write = False
-            if recv_write == True:
+            if is_recv_write == True:
                 multilne.print("recv write")
-                recv_write = False
+                is_recv_write = False
 
         self._th_close = True
         window.close()
