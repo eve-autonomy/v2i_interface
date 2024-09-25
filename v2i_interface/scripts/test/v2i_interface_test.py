@@ -74,7 +74,7 @@ class DummyInfraEcu:
 
     def recv(self):
         try:
-            message, cli_addr = self._recv_socket.recvfrom(self._buff_size)
+            message = self._recv_socket.recvfrom(self._buff_size)
         except OSError:
             return -1
 
