@@ -74,7 +74,7 @@ class DummyInfraEcu:
 
     def recv(self):
         try:
-            message = self._recv_socket.recvfrom(self._buff_size)
+            message, cli_addr = self._recv_socket.recvfrom(self._buff_size)
         except OSError:
             return -1
 
@@ -184,6 +184,7 @@ class V2iInterfaceTest(Node):
         self.run()
 
     def __del__(self):
+        self._th_close = True
         del self._dummy
 
     def main_loop(self):
