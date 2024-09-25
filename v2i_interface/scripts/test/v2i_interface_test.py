@@ -26,7 +26,6 @@ import TkEasyGUI as eg
 
 import os
 
-import signal
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSDurabilityPolicy, QoSProfile
