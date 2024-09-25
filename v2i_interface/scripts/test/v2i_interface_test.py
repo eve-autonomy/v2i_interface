@@ -189,7 +189,7 @@ class V2iInterfaceTest(Node):
     def main_loop(self):
         self._window_refresh_interval_ms = 100
         self._base_time = time.time()
-        global send_write
+        global is_send_write
         while True:
             if(self._th_close):
                 break
@@ -206,7 +206,7 @@ class V2iInterfaceTest(Node):
                             self._send_count[1][i] -= self._window_refresh_interval_ms
             if (data_flg):
                 self._dummy.send(1, 1, 1, reply_array)
-                send_write = True
+                is_send_write = True
                 self._fp_send.write('{}, '.format(time.time_ns()))
                 self._fp_send.write(', '.join('{}'.format(x)
                                               for x in reply_array))
@@ -233,7 +233,7 @@ class V2iInterfaceTest(Node):
 
     def run(self):
         global window
-        global send_write
+        global is_send_write
         global recv_write
         os.makedirs(os.path.dirname(self._recv_output_filename), exist_ok=True)
         os.makedirs(os.path.dirname(self._send_output_filename), exist_ok=True)
@@ -247,7 +247,7 @@ class V2iInterfaceTest(Node):
         th_main.start()
 
         multilne:eg.Multiline = window['-OUTPUT-']
-        send_write = False
+        is_send_write = False
         recv_write = False
 
         while True:
@@ -271,9 +271,9 @@ class V2iInterfaceTest(Node):
             if event == '-BUTTON2-':
                 self._send_flg = False
                 window['-BUTTON1-'].update("Start ")
-            if send_write == True:
+            if is_send_write == True:
                 multilne.print("send write")
-                send_write = False
+                is_send_write = False
             if recv_write == True:
                 multilne.print("recv write")
                 recv_write = False
