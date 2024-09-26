@@ -33,3 +33,20 @@ These are mandatory parameters of UDP connection to a user-defined broadcasting 
 |receive_port  |
 
 If you want to use different set of paremeters, fork the [v2i_interface_params.default](https://github.com/eve-autonomy/v2i_interface_params.default) repository.
+
+## How to use test tools
+### install
+Requirements
+```
+pip3 install -r tkeasygui
+```
+### Run 
+```
+ros2 launch v2i_interface v2i_interface_test.launch.xml
+```
+
+## License
+This project includes the following third-party software:
+
+- TkEasyGUI Copyright (c) 2024 kujirahand  Licensed under the MIT License.
+For more details, please see [https://github.com/kujirahand/tkeasygui-python/blob/main/LICENSE].
