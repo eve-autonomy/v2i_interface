@@ -240,11 +240,11 @@ class V2iInterfaceTest(Node):
         os.makedirs(os.path.dirname(self._send_output_filename), exist_ok=True)
 
         self._fp_recv = open(self._recv_output_filename, 'a')
-        th_infra_ecu = threading.Thread(target=self.recv_from_v2i_interface)
+        th_infra_ecu = threading.Thread(target=self.recv_from_v2i_interface,daemon=True)
         th_infra_ecu.start()
 
         self._fp_send = open(self._send_output_filename, 'a')
-        th_main = threading.Thread(target=self.main_loop)
+        th_main = threading.Thread(target=self.main_loop,daemon=True)
         th_main.start()
 
         multilne:eg.Multiline = window['-OUTPUT-']
