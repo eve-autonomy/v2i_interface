@@ -44,3 +44,6 @@ pip3 install -r tkeasygui
 ```
 ros2 launch v2i_interface v2i_interface_test.launch.xml
 ```
+
+### License
+This Test tool uses tkeasyGUI. tkeasyGUI is distributed under the MIT License. For more details, please see [https://github.com/kujirahand/tkeasygui-python/blob/main/LICENSE].
