@@ -38,7 +38,7 @@ If you want to use different set of paremeters, fork the [v2i_interface_params.d
 ### install
 Requirements
 ```
-pip3 install -r TkEasyGUI
+pip3 install TkEasyGUI
 ```
 ### Run 
 ```
