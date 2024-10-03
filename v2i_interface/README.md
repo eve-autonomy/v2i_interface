@@ -42,7 +42,7 @@ pip3 install TkEasyGUI
 ```
 ### Run 
 ```
-ros2 launch v2i_interface v2i_interface_test.launch.xml
+ros2 launch v2i_interface v2i_interface_test.launch.xml operation_mode:=local_test
 ```
 
 ## License
