@@ -148,6 +148,7 @@ class V2iInterfaceNode(Node):
                     self._recv_array = []
 
     def send_udp_command(self):
+        self._request_array = [1]
         if(self._request_array is None):
             return
         if(len(self._request_array) > 0):
@@ -155,6 +156,7 @@ class V2iInterfaceNode(Node):
             if (ret == -1):
                 self._logger.error("send udp error")
                 raise RuntimeError
+            self._logger.info("send udp{0}".format(self._request_array))
 
     def publish_infrastructure_states(self):
         with self.recv_lock:
@@ -181,19 +183,19 @@ class V2iInterfaceNode(Node):
         duration_sec = duration.nanoseconds * 1e-9
         return (duration_sec > self._data_store_timeout_sec)
 
-    def reopen_socket(node):
-        node._th_close = True
-        node._recv_th.join(node._receive_thread_close_timeout)
-        if node._recv_th.is_alive():
-            node.fin()
+    def reopen_socket(self):
+        self._th_close = True
+        self._recv_th.join(self._receive_thread_close_timeout)
+        if self._recv_th.is_alive():
+            self.fin()
             rclpy.try_shutdown()
             return
-        del node._udp
-        time.sleep(node._socket_reopen_interval)
-        node.create_new_udp_control()
-        node._th_close = False
-        node._recv_th = threading.Thread(target=node.recv_loop)
-        node._recv_th.start()
+        del self._udp
+        time.sleep(self._socket_reopen_interval)
+        self.create_new_udp_control()
+        self._th_close = False
+        self._recv_th = threading.Thread(target=self.recv_loop)
+        self._recv_th.start()
         return
 
 def main(args=None):
@@ -205,7 +207,7 @@ def main(args=None):
             try:
                 rclpy.spin(node)
             except RuntimeError:
-                reopen_socket(node)
+                node.reopen_socket()
                 continue
     except KeyboardInterrupt:
         pass
