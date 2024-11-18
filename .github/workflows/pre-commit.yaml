@@ -2,7 +2,6 @@ name: pre-commit
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
 jobs:
   pre-commit:
     if: ${{ github.event.repository.private }}
