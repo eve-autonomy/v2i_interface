@@ -49,9 +49,9 @@ void VtlCommandConverter::init(rclcpp::Node* node)
     "/api/operation_mode/state", rclcpp::QoS(1).transient_local(),
     std::bind(&VtlCommandConverter::on_operation_mode_state, this, _1));
 
-  sub_autonomous_driving_start_button_ = ??<??>(
+/* sub_autonomous_driving_start_button_ = ??<??>(
     "??",rclcpp::QoS(1).transient_local(),
-    std::bind(&VtlCommandConverter::autonomous_driving_start_button, this, _1));
+    std::bind(&VtlCommandConverter::autonomous_driving_start_button, this, _1)); */
 
   
   // Publisher
@@ -81,29 +81,28 @@ void VtlCommandConverter::onCommand(const MainInputCommandArr::ConstSharedPtr ms
   converter_pipeline_->add(converter_multimap);
 }
 
-void VtlCommandConverter::onState(const RouteState::ConstSharedPtr msg)
+void VtlCommandConverter::onState(uint16 msg)
 {
   state_ = msg;
 }
 
-void VtlCommandConverter::onRoute(const Route::ConstSharedPtr msg)
+void VtlCommandConverter::onRoute(uint16 msg)
 {
   Route_ = msg;
 }
 
 void VtlCommandConverter::on_operation_mode_state(const OperationModeState::ConstSharedPtr msg)
 {
-  is_autoware_control_ = msg->is_autoware_control_enabled;
-  is_in_transition_ = msg->is_in_transition;
-  mode_ = msg->mode;
+  is_autoware_control_ = msg ->is_autoware_control_enabled;
+  is_in_transition_ = msg ->is_in_transition;
+  mode_ = msg ->mode;
 }
 
 void VtlCommandConverter::autonomous_driving_start_button(??)
 {
-  is_accept_ = msg->is_accept;
-  is_repuest_ = msg->is_request;
+  is_accept_ = msg ->is_accept;
+  is_repuest_ = msg ->is_request;
 }
-
 
 std::shared_ptr<InterfaceConverterMultiMap> VtlCommandConverter::createConverter(
     const MainInputCommandArr::ConstSharedPtr& original_command) const
@@ -147,7 +146,7 @@ std::optional<MainOutputCommandArr> VtlCommandConverter::requestCommand(
   }
   std::unordered_map<uint8_t, MainOutputCommand> command_map;
   for (const auto& [id, converter] : *converter_multimap) {
-    const auto& req = converter->request(state_);
+    const auto& req = converter->request;
     if (!req) {
       RCLCPP_DEBUG(node_->get_logger(),
         "VtlCommandConverter:%s: failed to request (id=%d).", __func__, id);

@@ -23,7 +23,9 @@
 #include "v2i_interface_msgs/msg/infrastructure_command_array.hpp"
 
 // sub input
-#include "autoware_state_machine_msgs/msg/state_machine.hpp"
+#include "autoware_adapi_v1_msgs/msg/RouteState.hpp"
+#include "autoware_adapi_v1_msgs/msg/Route.hpp"
+#include "autoware_adapi_v1_msgs/msg/OperationModeState.hpp"
 
 #include "vtl_adapter/interface_converter_data_pipeline.hpp"
 #include "vtl_adapter/eve_vtl_interface_converter.hpp"
@@ -36,8 +38,6 @@ using MainInputCommand = tier4_v2x_msgs::msg::InfrastructureCommand;
 using MainOutputCommandArr = v2i_interface_msgs::msg::InfrastructureCommandArray;
 using MainOutputCommand = v2i_interface_msgs::msg::InfrastructureCommand;
 using InterfaceConverter = eve_vtl_interface_converter::EveVTLInterfaceConverter;
-
-using SubInputState = autoware_state_machine_msgs::msg::StateMachine;
 
 using InterfaceConverterMultiMap =
   std::unordered_multimap<uint8_t, std::shared_ptr<InterfaceConverter>>;
@@ -68,13 +68,14 @@ private:
   rclcpp::Subscription<RouteState>::SharedPtr sub_routing_state_;
   rclcpp::Subscription<Route>::SharedPtr sub_routing_route_;
   rclcpp::Subscription<OperationModeState>::SharedPtr sub_Operation_mode_state_;
-  rclcpp::Subscription<??>::SharedPtr sub_autonomous_driving_start_button_;
+  //rclcpp::Subscription<??>::SharedPtr sub_autonomous_driving_start_button_;
   
   // Callback
   void onState(const RouteState::ConstSharedPtr msg);
   void onRoute(const Route::ConstSharedPtr msg);
   void on_operation_mode_state(const OperationModeState::ConstSharedPtr msg);
-  void autonomous_driving_start_button(??)
+  //void autonomous_driving_start_button(??)
+
   // Preprocess
   std::shared_ptr<InterfaceConverterMultiMap> createConverter(
     const MainInputCommandArr::ConstSharedPtr& original_command) const;

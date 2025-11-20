@@ -20,7 +20,11 @@
 #include "rclcpp/rclcpp.hpp"
 #include "tier4_v2x_msgs/msg/infrastructure_command.hpp"
 #include "tier4_v2x_msgs/msg/key_value.hpp"
-#include "autoware_state_machine_msgs/msg/state_machine.hpp"
+
+#include "autoware_adapi_v1_msgs/msg/RouteState.hpp"
+#include "autoware_adapi_v1_msgs/msg/Route.hpp"
+#include "autoware_adapi_v1_msgs/msg/OperationModeState.hpp"
+#include "vtl_adapter/vtl_command_converter.hpp"
 
 #include "vtl_adapter/eve_vtl_attribute.hpp"
 
@@ -29,7 +33,6 @@ namespace eve_vtl_interface_converter
 
 using EveVTLAttr = eve_vtl_attribute::EveVTLAttr;
 using InfrastructureCommand = tier4_v2x_msgs::msg::InfrastructureCommand;
-using StateMachine = autoware_state_machine_msgs::msg::StateMachine;
 
 class EveVTLInterfaceConverter
 {
@@ -39,14 +42,12 @@ public:
 
   const std::shared_ptr<EveVTLAttr>& vtlAttribute() const;
   const InfrastructureCommand& command() const;
-  std::optional<uint8_t> request(
-    const StateMachine::ConstSharedPtr& state) const;
+  std::optional<uint8_t> request;
   bool response(const uint8_t& response_bit) const;
 private:
   bool init(const InfrastructureCommand& input_command);
   std::string convertInfraCommand(const uint8_t& input_command) const;
-  std::optional<std::string> convertADState(
-    const RouteState::ConstSharedPtr& state) const;
+  std::optional<std::string> convertADState;
 
 
   InfrastructureCommand command_;

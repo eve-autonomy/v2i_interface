@@ -45,8 +45,7 @@ const InfrastructureCommand& EveVTLInterfaceConverter::command() const
   return command_;
 }
 
-std::optional<uint8_t> EveVTLInterfaceConverter::request(
-    const StateMachine::ConstSharedPtr& state) const
+std::optional<uint8_t> EveVTLInterfaceConverter::request
 {
   if (!vtl_attr_) {
     RCLCPP_WARN_THROTTLE(
@@ -55,8 +54,8 @@ std::optional<uint8_t> EveVTLInterfaceConverter::request(
     return std::nullopt;
   }
   const auto command_str = convertInfraCommand(command_.state);
-  const auto state_str = convertADState(state);
-  return vtl_attr_->request(command_str, state_str);
+  const auto state_str = convertADState;
+  return vtl_attr_ ->request(command_str, state_str);
 }
 
 bool EveVTLInterfaceConverter::response(const uint8_t& response_bit) const
@@ -266,22 +265,20 @@ std::optional<std::string>
     return eve_vtl_spec::VALUE_PERMIT_STATE_NULL;
   }
   const auto permit_state = permit_state_opt.value();
-
   const auto& srv_state = state->service_layer_state;
   bool is_valid_state = false;
-  bool isReadyForDeparture_flg=false;
-  bool driving_flg=false;
+  bool isReadyForDeparture_flg = false;
+  bool driving_flg = false;
 
-  if(state_ == autoware_adapi_v1_msgs::msg::RouteState::SET){
-    if (route_.size() != 0){
-      if(is_autoware_control_ && !is_in_transition_ ){
-        if(mode_ != AUTONOMOUS){
-          if(is_accept && is_request){
-            isReadyForDeparture_flg= true;
+  if (state_ == autoware_adapi_v1_msgs::msg::RouteState::SET) {
+    if (route_.size() != 0) {
+      if (is_autoware_control_ && !is_in_transition_ ) {
+        if (mode_ != AUTONOMOUS) {
+          if (is_accept || is_request) {
+            isReadyForDeparture_flg = true;
           }
-        else{
-          driving_flg=true;
-        }
+        } else {
+          driving_flg = true;
         }
       }
     }
