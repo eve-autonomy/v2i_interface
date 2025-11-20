@@ -37,10 +37,23 @@ void VtlCommandConverter::init(rclcpp::Node* node)
   subscriber_option.callback_group = group;
 
   // Subscription
-  state_sub_ = node->create_subscription<SubInputState>(
-    "/autoware_state_machine/state", 1,
-    std::bind(&VtlCommandConverter::onState, this, _1),
-    subscriber_option);
+  sub_routing_state_ = node->create_subscription<RouteState>(
+    "/api/routing/state", rclcpp::QoS{1}.transient_local(),
+    std::bind(&VtlCommandConverter::onState, this, std::placeholders::_1));
+
+  sub_routing_route_ = node->create_subscription<Route>(
+    "/api/routing/route", rclcpp::QoS{1}.transient_local(),
+    std::bind(&VtlCommandConverter::onRoute, this, std::placeholders::_1));
+
+  sub_operation_mode_state_ = create_subscription<OperationModeState>(
+    "/api/operation_mode/state", rclcpp::QoS(1).transient_local(),
+    std::bind(&VtlCommandConverter::on_operation_mode_state, this, _1));
+
+  sub_autonomous_driving_start_button_ = ??<??>(
+    "??",rclcpp::QoS(1).transient_local(),
+    std::bind(&VtlCommandConverter::autonomous_driving_start_button, this, _1));
+
+  
   // Publisher
   command_pub_ = node->create_publisher<MainOutputCommandArr>(
     "~/output/infrastructure_commands",
@@ -69,10 +82,29 @@ void VtlCommandConverter::onCommand(const MainInputCommandArr::ConstSharedPtr ms
   converter_pipeline_->add(converter_multimap);
 }
 
-void VtlCommandConverter::onState(const SubInputState::ConstSharedPtr msg)
+void VtlCommandConverter::onState(const RouteState::ConstSharedPtr msg)
 {
   state_ = msg;
 }
+
+void VtlCommandConverter::onRoute(const Route::ConstSharedPtr msg)
+{
+  Route_ = msg;
+}
+
+void VtlCommandConverter::on_operation_mode_state(const OperationModeState::ConstSharedPtr msg)
+{
+  is_autoware_control_ = msg->is_autoware_control_enabled;
+  is_in_transition_ = msg->is_in_transition;
+  mode_ = msg->mode;
+}
+
+void VtlCommandConverter::autonomous_driving_start_button(??)
+{
+  is_accept_ = msg->is_accept;
+  is_repuest_ = msg->is_request;
+}
+
 
 std::shared_ptr<InterfaceConverterMultiMap> VtlCommandConverter::createConverter(
     const MainInputCommandArr::ConstSharedPtr& original_command) const
