@@ -63,7 +63,6 @@ void VtlCommandConverter::init(rclcpp::Node* node)
     "VtlCommandConverter: initialized.");
 }
 
-
 std::shared_ptr<IFConverterDataPipeline> VtlCommandConverter::converterPipeline()
 {
   return converter_pipeline_;

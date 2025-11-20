@@ -46,7 +46,8 @@ private:
   bool init(const InfrastructureCommand& input_command);
   std::string convertInfraCommand(const uint8_t& input_command) const;
   std::optional<std::string> convertADState(
-    const StateMachine::ConstSharedPtr& state) const;
+    const RouteState::ConstSharedPtr& state) const;
+
 
   InfrastructureCommand command_;
   std::shared_ptr<EveVTLAttr> vtl_attr_;

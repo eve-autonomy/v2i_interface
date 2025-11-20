@@ -12,7 +12,7 @@
 -->
 <launch>
   <node pkg="vtl_adapter" exec="vtl_adapter_node" name="vtl_adapter" output="screen">
-    <remap from="~/input/infrastructure_commands"  to="/awapi/tmp/infrastructure_commands"/>
+    <remap from="~/input/infrastructure_commands"  to="/api/external/get/virtual_traffic_light/commands"/>
     <remap from="~/output/infrastructure_commands" to="/v2i_gate/infrastructure_commands"/>
     <remap from="~/input/infrastructure_states"    to="/v2i/infrastructure_states"/>
     <remap from="~/output/infrastructure_states"   to="/system/v2x/virtual_traffic_light_states"/>

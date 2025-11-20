@@ -250,7 +250,7 @@ std::string EveVTLInterfaceConverter::convertInfraCommand(const uint8_t& input_c
 }
 
 std::optional<std::string>
-  EveVTLInterfaceConverter::convertADState(const StateMachine::ConstSharedPtr& state) const
+  EveVTLInterfaceConverter::convertADState()
 {
   if (!vtl_attr_) {
     RCLCPP_WARN_THROTTLE(
@@ -267,19 +267,26 @@ std::optional<std::string>
   }
   const auto permit_state = permit_state_opt.value();
 
-  if (!state) {
-    RCLCPP_WARN_THROTTLE(
-      node_->get_logger(), *node_->get_clock(), ERROR_THROTTLE_MSEC,
-      "EveVTLInterfaceConverter::%s: state is null", __func__);
-    return std::nullopt;
-  }
   const auto& srv_state = state->service_layer_state;
   bool is_valid_state = false;
-  if (permit_state == eve_vtl_spec::VALUE_PERMIT_STATE_DRIVING) {
-    const bool fill_lower_bound = (srv_state >= StateMachine::STATE_RUNNING);
-    const bool fill_upper_bound = (srv_state < StateMachine::STATE_ARRIVED_GOAL);
-    is_valid_state = (fill_lower_bound && fill_upper_bound);
-  }
+  bool isReadyForDeparture_flg=false;
+  bool driving_flg=false;
+
+  if(state_ == autoware_adapi_v1_msgs::msg::RouteState::SET){
+    if (route_.size() != 0){
+      if(is_autoware_control_ && !is_in_transition_ ){
+        if(mode_ != AUTONOMOUS){
+          if(is_accept && is_request){
+            isReadyForDeparture_flg= true;
+          }
+        else{
+          driving_flg=true;
+        }
+        }
+      }
+    }
+  } 
+  is_valid_state = (isReadyForDeparture_flg || driving_flg);
   else if (permit_state == eve_vtl_spec::VALUE_PERMIT_STATE_NULL) {
     is_valid_state = true;
   }
