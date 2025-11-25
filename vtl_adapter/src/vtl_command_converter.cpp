@@ -47,7 +47,7 @@ void VtlCommandConverter::init(rclcpp::Node* node)
 
   sub_operation_mode_state_ = create_subscription<OperationModeState>(
     "/api/operation_mode/state", rclcpp::QoS(1).transient_local(),
-    std::bind(&VtlCommandConverter::on_operation_mode_state, this, _1));
+    std::bind(&VtlCommandConverter::onOperationModeState, this, _1));
 
 /* sub_autonomous_driving_start_button_ = ??<??>(
     "??",rclcpp::QoS(1).transient_local(),
@@ -88,21 +88,21 @@ void VtlCommandConverter::onState(uint16 msg)
 
 void VtlCommandConverter::onRoute(uint16 msg)
 {
-  Route_ = msg;
+  route_ = msg;
 }
 
-void VtlCommandConverter::on_operation_mode_state(const OperationModeState::ConstSharedPtr msg)
+void VtlCommandConverter::onOperationModeState(const OperationModeState::ConstSharedPtr msg)
 {
   is_autoware_control_ = msg ->is_autoware_control_enabled;
   is_in_transition_ = msg ->is_in_transition;
   mode_ = msg ->mode;
 }
 
-void VtlCommandConverter::autonomous_driving_start_button(??)
+/*void VtlCommandConverter::autonomous_driving_start_button(??)
 {
   is_accept_ = msg ->is_accept;
   is_repuest_ = msg ->is_request;
-}
+}*/
 
 std::shared_ptr<InterfaceConverterMultiMap> VtlCommandConverter::createConverter(
     const MainInputCommandArr::ConstSharedPtr& original_command) const

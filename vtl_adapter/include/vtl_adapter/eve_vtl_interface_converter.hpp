@@ -49,7 +49,6 @@ private:
   std::string convertInfraCommand(const uint8_t& input_command) const;
   std::optional<std::string> convertADState;
 
-
   InfrastructureCommand command_;
   std::shared_ptr<EveVTLAttr> vtl_attr_;
   rclcpp::Node* node_;

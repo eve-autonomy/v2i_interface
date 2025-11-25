@@ -274,9 +274,9 @@ std::optional<std::string>
     if (route_.size() != 0) {
       if (is_autoware_control_ && !is_in_transition_ ) {
         if (mode_ != AUTONOMOUS) {
-          if (is_accept || is_request) {
+          //if (is_accept || is_request) {
             isReadyForDeparture_flg = true;
-          }
+          //}
         } else {
           driving_flg = true;
         }
