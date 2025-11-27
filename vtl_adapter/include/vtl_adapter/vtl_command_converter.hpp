@@ -23,9 +23,6 @@
 #include "v2i_interface_msgs/msg/infrastructure_command_array.hpp"
 
 // sub input
-#include "autoware_adapi_v1_msgs/msg/RouteState.hpp"
-#include "autoware_adapi_v1_msgs/msg/Route.hpp"
-#include "autoware_adapi_v1_msgs/msg/OperationModeState.hpp"
 
 #include "vtl_adapter/interface_converter_data_pipeline.hpp"
 #include "vtl_adapter/eve_vtl_interface_converter.hpp"
@@ -46,10 +43,6 @@ using InterfaceConverterMap =
 using IFConverterDataPipeline =
   interface_converter_data_pipeline::IFConverterDataPipeline;
 
-using RouteState = autoware_adapi_v1_msgs::msg::RouteState;
-using Route = autoware_adapi_v1_msgs::msg::Route;
-using OperationModeState = autoware_adapi_v1_msgs::msg::OperationModeState;
-
 class VtlCommandConverter
 {
 public:
@@ -64,18 +57,6 @@ private:
   // Publisher
   rclcpp::Publisher<MainOutputCommandArr>::SharedPtr command_pub_;
 
-  // Subscription
-  rclcpp::Subscription<RouteState>::SharedPtr sub_routing_state_;
-  rclcpp::Subscription<Route>::SharedPtr sub_routing_route_;
-  rclcpp::Subscription<OperationModeState>::SharedPtr sub_operation_mode_state_;
-  //rclcpp::Subscription<??>::SharedPtr sub_autonomous_driving_start_button_;
-  
-  // Callback
-  void onState(const RouteState::ConstSharedPtr msg);
-  void onRoute(const Route::ConstSharedPtr msg);
-  void onOperationModeState(const OperationModeState::ConstSharedPtr msg);
-  //void autonomousDrivingStartButton(??)
-
   // Preprocess
   std::shared_ptr<InterfaceConverterMultiMap> createConverter(
     const MainInputCommandArr::ConstSharedPtr& original_command) const;
@@ -83,14 +64,7 @@ private:
     const std::shared_ptr<InterfaceConverterMultiMap>& converter_multimap) const;
 
   //member variables
-  uint16 state_;
-  uint16 route_;
   std::shared_ptr<IFConverterDataPipeline> converter_pipeline_;
-  bool is_autoware_control_;
-  bool is_in_transition_;
-  uint8_t mode_;
-  /*bool is_accept_;
-  bool is_repuest_;*/
 };
 
 }  // namespace vtl_command_converter

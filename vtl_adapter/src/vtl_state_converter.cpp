@@ -38,7 +38,6 @@ void VtlStateConverter::init(rclcpp::Node* node)
     "~/input/infrastructure_states", 1,
     std::bind(&VtlStateConverter::onState, this, _1),
     subscriber_option);
-    
   // Publisher
   state_pub_ = node->create_publisher<OutputStateArr>(
     "~/output/infrastructure_states",
