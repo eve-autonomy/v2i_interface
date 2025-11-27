@@ -106,7 +106,7 @@ std::optional<MainOutputCommandArr> VtlCommandConverter::requestCommand(
   }
   std::unordered_map<uint8_t, MainOutputCommand> command_map;
   for (const auto& [id, converter] : *converter_multimap) {
-    const auto& req = converter->request() const;
+    const auto& req = converter->request();
     if (!req) {
       RCLCPP_DEBUG(node_->get_logger(),
         "VtlCommandConverter:%s: failed to request (id=%d).", __func__, id);

@@ -24,6 +24,7 @@
 #include "autoware_adapi_v1_msgs/msg/route_state.hpp"
 #include "autoware_adapi_v1_msgs/msg/route.hpp"
 #include "autoware_adapi_v1_msgs/msg/operation_mode_state.hpp"
+#include "eve_cmd_gate_msgs/msg/engage_request_state.hpp"
 
 #include "vtl_adapter/eve_vtl_attribute.hpp"
 
@@ -37,6 +38,7 @@ using RouteState = autoware_adapi_v1_msgs::msg::RouteState;
 using Route = autoware_adapi_v1_msgs::msg::Route;
 using OperationModeState = autoware_adapi_v1_msgs::msg::OperationModeState;
 using RouteData = autoware_adapi_v1_msgs::msg::RouteData;
+using AutonomousDrivingStartButton =eve_cmd_gate_msgs::msg::EngageRequestState;
 
 class EveVTLInterfaceConverter
 {
@@ -57,13 +59,13 @@ private:
   rclcpp::Subscription<RouteState>::SharedPtr sub_routing_state_;
   rclcpp::Subscription<Route>::SharedPtr sub_routing_route_;
   rclcpp::Subscription<OperationModeState>::SharedPtr sub_operation_mode_state_;
-  //rclcpp::Subscription<??>::SharedPtr sub_autonomous_driving_start_button_;
+  rclcpp::Subscription<AutonomousDrivingStartButton>::SharedPtr sub_autonomous_driving_start_button_;
 
   // Callback
   void onState(const RouteState::ConstSharedPtr msg);
   void onRoute(const Route::ConstSharedPtr msg);
   void onOperationModeState(const OperationModeState::ConstSharedPtr msg);
-  //void autonomousDrivingStartButton(??)
+  void onAutonomousDrivingStartButton(const AutonomousDrivingStartButton::ConstSharedPtr msg);
 
   InfrastructureCommand command_;
   std::shared_ptr<EveVTLAttr> vtl_attr_;
@@ -73,8 +75,8 @@ private:
   bool is_autoware_control_;
   bool is_in_transition_;
   uint8_t mode_;
-   /*bool is_accept_;
-  bool is_repuest_;*/
+  bool is_accept_;
+  bool is_request_;
 };
 
 }  // namespace eve_vtl_interface_converter

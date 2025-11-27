@@ -31,6 +31,7 @@
   <depend>tier4_v2x_msgs</depend>
   <depend>v2i_interface_msgs</depend>
   <depend>autoware_adapi_v1_msgs</depend>
+  <depend>eve_cmd_gate_msgs</depend>
 
   <test_depend>ament_cmake_gtest</test_depend>
   <test_depend>ament_lint_auto</test_depend>

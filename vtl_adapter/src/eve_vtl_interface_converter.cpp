@@ -48,9 +48,9 @@ EveVTLInterfaceConverter::EveVTLInterfaceConverter(
     "/api/operation_mode/state", rclcpp::QoS(1).transient_local(),
     std::bind(&EveVTLInterfaceConverter::onOperationModeState, this, _1));
 
-/* sub_autonomous_driving_start_button_ = ??<??>(
-    "??",rclcpp::QoS(1).transient_local(),
-    std::bind(&EveVTLInterfaceConverter::autonomous_driving_start_button, this, _1)); */
+ sub_autonomous_driving_start_button_ = node->create_subscription<AutonomousDrivingStartButton>(
+    "/eve_cmd_gate/engage_request_state",rclcpp::QoS(1).transient_local(),
+    std::bind(&EveVTLInterfaceConverter::onAutonomousDrivingStartButton, this, _1)); 
 }
 
 const std::shared_ptr<EveVTLAttr>& EveVTLInterfaceConverter::vtlAttribute() const
@@ -70,7 +70,7 @@ void EveVTLInterfaceConverter::onState(const RouteState::ConstSharedPtr msg)
 
 void EveVTLInterfaceConverter::onRoute(const Route::ConstSharedPtr msg)
 {
-  route_ = msg;
+  route_.data = msg->data;
 }
 
 void EveVTLInterfaceConverter::onOperationModeState(const OperationModeState::ConstSharedPtr msg)
@@ -80,11 +80,11 @@ void EveVTLInterfaceConverter::onOperationModeState(const OperationModeState::Co
   mode_ = msg->mode;
 }
 
-/*void VtlCommandConverter::autonomous_driving_start_button(??)
+void EveVTLInterfaceConverter::onAutonomousDrivingStartButton(const AutonomousDrivingStartButton::ConstSharedPtr msg)
 {
-  is_accept_ = msg ->is_accept;
-  is_repuest_ = msg ->is_request;
-}*/
+  is_accept_ = msg ->is_engage_requesting;
+  is_request_ = msg ->is_engage_accepted;
+}
 
 std::optional<uint8_t> EveVTLInterfaceConverter::request() const
 {
@@ -95,7 +95,7 @@ std::optional<uint8_t> EveVTLInterfaceConverter::request() const
     return std::nullopt;
   }
   const auto command_str = convertInfraCommand(command_.state);
-  const auto state_str = convertADState() const;
+  const auto state_str = convertADState();
   return vtl_attr_ ->request(command_str, state_str);
 }
 
@@ -312,10 +312,10 @@ std::optional<std::string> EveVTLInterfaceConverter::convertADState() const
   if (state_ == autoware_adapi_v1_msgs::msg::RouteState::SET) {
     if (route_.data.size() != 0) {
       if (is_autoware_control_ && !is_in_transition_ ) {
-        if (mode_ != AUTONOMOUS) {
-          //if (is_accept || is_request) {
+        if (mode_ != OperationModeState::AUTONOMOUS) {
+          if (is_accept_ || is_request_) {
             isReadyForDeparture_flg = true;
-          //}
+          }
         } else {
           driving_flg = true;
         }
