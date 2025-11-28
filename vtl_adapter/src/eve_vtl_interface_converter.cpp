@@ -75,15 +75,15 @@ void EveVTLInterfaceConverter::onRoute(const Route::ConstSharedPtr msg)
 
 void EveVTLInterfaceConverter::onOperationModeState(const OperationModeState::ConstSharedPtr msg)
 {
-  is_autoware_control_ = msg->is_autoware_control_enabled;
+  is_autoware_control_enabled_ = msg->is_autoware_control_enabled;
   is_in_transition_ = msg->is_in_transition;
   mode_ = msg->mode;
 }
 
 void EveVTLInterfaceConverter::onAutonomousDrivingStartButton(const AutonomousDrivingStartButton::ConstSharedPtr msg)
 {
-  is_accept_ = msg ->is_engage_requesting;
-  is_request_ = msg ->is_engage_accepted;
+  is_accept_ = msg ->is_engage_accepted;
+  is_request_ = msg ->is_engage_requesting;
 }
 
 std::optional<uint8_t> EveVTLInterfaceConverter::request() const
@@ -311,7 +311,7 @@ std::optional<std::string> EveVTLInterfaceConverter::convertADState() const
 
   if (state_ == autoware_adapi_v1_msgs::msg::RouteState::SET) {
     if (route_.data.size() != 0) {
-      if (is_autoware_control_ && !is_in_transition_ ) {
+      if (is_autoware_control_enabled_ && !is_in_transition_ ) {
         if (mode_ != OperationModeState::AUTONOMOUS) {
           if (is_accept_ || is_request_) {
             isReadyForDeparture_flg = true;
