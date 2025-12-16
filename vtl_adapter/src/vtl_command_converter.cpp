@@ -36,11 +36,7 @@ void VtlCommandConverter::init(rclcpp::Node* node)
   auto subscriber_option = rclcpp::SubscriptionOptions();
   subscriber_option.callback_group = group;
 
-  // Subscription
-  state_sub_ = node->create_subscription<SubInputState>(
-    "/autoware_state_machine/state", 1,
-    std::bind(&VtlCommandConverter::onState, this, _1),
-    subscriber_option);
+
   // Publisher
   command_pub_ = node->create_publisher<MainOutputCommandArr>(
     "~/output/infrastructure_commands",
@@ -49,7 +45,6 @@ void VtlCommandConverter::init(rclcpp::Node* node)
   RCLCPP_INFO(node_->get_logger(),
     "VtlCommandConverter: initialized.");
 }
-
 
 std::shared_ptr<IFConverterDataPipeline> VtlCommandConverter::converterPipeline()
 {
@@ -67,11 +62,6 @@ void VtlCommandConverter::onCommand(const MainInputCommandArr::ConstSharedPtr ms
   }
   command_pub_->publish(output_command.value());
   converter_pipeline_->add(converter_multimap);
-}
-
-void VtlCommandConverter::onState(const SubInputState::ConstSharedPtr msg)
-{
-  state_ = msg;
 }
 
 std::shared_ptr<InterfaceConverterMultiMap> VtlCommandConverter::createConverter(
@@ -116,7 +106,7 @@ std::optional<MainOutputCommandArr> VtlCommandConverter::requestCommand(
   }
   std::unordered_map<uint8_t, MainOutputCommand> command_map;
   for (const auto& [id, converter] : *converter_multimap) {
-    const auto& req = converter->request(state_);
+    const auto& req = converter->request();
     if (!req) {
       RCLCPP_DEBUG(node_->get_logger(),
         "VtlCommandConverter:%s: failed to request (id=%d).", __func__, id);
