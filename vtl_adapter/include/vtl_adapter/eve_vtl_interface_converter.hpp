@@ -72,7 +72,7 @@ private:
   rclcpp::Node* node_;
   uint16_t state_;
   Route route_;
-  bool is_autoware_control_;
+  bool is_autoware_control_enabled_;
   bool is_in_transition_;
   uint8_t mode_;
   bool is_accept_;
