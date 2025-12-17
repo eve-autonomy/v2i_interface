@@ -28,11 +28,29 @@ Class public function
 ***************************************************************
 */
 
+
 EveVTLInterfaceConverter::EveVTLInterfaceConverter(
   const InfrastructureCommand& input_command, rclcpp::Node* node)
   : command_(input_command), node_(node)
 {
+  using namespace std::placeholders;
   init(input_command);
+  // Subscription
+  sub_routing_state_ = node->create_subscription<RouteState>(
+    "/api/routing/state", rclcpp::QoS{1}.transient_local(),
+    std::bind(&EveVTLInterfaceConverter::onState, this, std::placeholders::_1));
+
+  sub_routing_route_ = node->create_subscription<Route>(
+    "/api/routing/route", rclcpp::QoS{1}.transient_local(),
+    std::bind(&EveVTLInterfaceConverter::onRoute, this, std::placeholders::_1));
+
+  sub_operation_mode_state_ = node->create_subscription<OperationModeState>(
+    "/api/operation_mode/state", rclcpp::QoS(1).transient_local(),
+    std::bind(&EveVTLInterfaceConverter::onOperationModeState, this, _1));
+
+ sub_autonomous_driving_start_button_ = node->create_subscription<AutonomousDrivingStartButton>(
+    "/eve_cmd_gate/engage_request_state",rclcpp::QoS(1).transient_local(),
+    std::bind(&EveVTLInterfaceConverter::onAutonomousDrivingStartButton, this, _1)); 
 }
 
 const std::shared_ptr<EveVTLAttr>& EveVTLInterfaceConverter::vtlAttribute() const
@@ -45,8 +63,30 @@ const InfrastructureCommand& EveVTLInterfaceConverter::command() const
   return command_;
 }
 
-std::optional<uint8_t> EveVTLInterfaceConverter::request(
-    const StateMachine::ConstSharedPtr& state) const
+void EveVTLInterfaceConverter::onState(const RouteState::ConstSharedPtr msg)
+{
+  state_ = msg->state;
+}
+
+void EveVTLInterfaceConverter::onRoute(const Route::ConstSharedPtr msg)
+{
+  route_.data = msg->data;
+}
+
+void EveVTLInterfaceConverter::onOperationModeState(const OperationModeState::ConstSharedPtr msg)
+{
+  is_autoware_control_enabled_ = msg->is_autoware_control_enabled;
+  is_in_transition_ = msg->is_in_transition;
+  mode_ = msg->mode;
+}
+
+void EveVTLInterfaceConverter::onAutonomousDrivingStartButton(const AutonomousDrivingStartButton::ConstSharedPtr msg)
+{
+  is_accept_ = msg ->is_engage_accepted;
+  is_request_ = msg ->is_engage_requesting;
+}
+
+std::optional<uint8_t> EveVTLInterfaceConverter::request() const
 {
   if (!vtl_attr_) {
     RCLCPP_WARN_THROTTLE(
@@ -55,8 +95,8 @@ std::optional<uint8_t> EveVTLInterfaceConverter::request(
     return std::nullopt;
   }
   const auto command_str = convertInfraCommand(command_.state);
-  const auto state_str = convertADState(state);
-  return vtl_attr_->request(command_str, state_str);
+  const auto state_str = convertADState();
+  return vtl_attr_ ->request(command_str, state_str);
 }
 
 bool EveVTLInterfaceConverter::response(const uint8_t& response_bit) const
@@ -249,8 +289,7 @@ std::string EveVTLInterfaceConverter::convertInfraCommand(const uint8_t& input_c
     (eve_vtl_spec::VALUE_SECTION_REQ) : (eve_vtl_spec::VALUE_SECTION_NULL);
 }
 
-std::optional<std::string>
-  EveVTLInterfaceConverter::convertADState(const StateMachine::ConstSharedPtr& state) const
+std::optional<std::string> EveVTLInterfaceConverter::convertADState() const
 {
   if (!vtl_attr_) {
     RCLCPP_WARN_THROTTLE(
@@ -266,21 +305,24 @@ std::optional<std::string>
     return eve_vtl_spec::VALUE_PERMIT_STATE_NULL;
   }
   const auto permit_state = permit_state_opt.value();
-
-  if (!state) {
-    RCLCPP_WARN_THROTTLE(
-      node_->get_logger(), *node_->get_clock(), ERROR_THROTTLE_MSEC,
-      "EveVTLInterfaceConverter::%s: state is null", __func__);
-    return std::nullopt;
-  }
-  const auto& srv_state = state->service_layer_state;
   bool is_valid_state = false;
-  if (permit_state == eve_vtl_spec::VALUE_PERMIT_STATE_DRIVING) {
-    const bool fill_lower_bound = (srv_state >= StateMachine::STATE_RUNNING);
-    const bool fill_upper_bound = (srv_state < StateMachine::STATE_ARRIVED_GOAL);
-    is_valid_state = (fill_lower_bound && fill_upper_bound);
-  }
-  else if (permit_state == eve_vtl_spec::VALUE_PERMIT_STATE_NULL) {
+  bool isReadyForDeparture_flg = false;
+  bool driving_flg = false;
+
+  if (state_ == autoware_adapi_v1_msgs::msg::RouteState::SET) {
+    if (route_.data.size() != 0) {
+      if (is_autoware_control_enabled_ && !is_in_transition_ ) {
+        if (mode_ != OperationModeState::AUTONOMOUS) {
+          if (is_accept_ || is_request_) {
+            isReadyForDeparture_flg = true;
+          }
+        } else {
+          driving_flg = true;
+        }
+      }
+    }
+    is_valid_state = (isReadyForDeparture_flg || driving_flg);
+  } else if (permit_state == eve_vtl_spec::VALUE_PERMIT_STATE_NULL) {
     is_valid_state = true;
   }
 
@@ -288,9 +330,8 @@ std::optional<std::string>
     RCLCPP_WARN_STREAM_THROTTLE(
       node_->get_logger(), *node_->get_clock(), ERROR_THROTTLE_MSEC,
       "EveVTLInterfaceConverter::" << __func__ <<
-      ": state is invalid: " << srv_state);
+      ": state is invalid " );
   }
   return (is_valid_state) ? permit_state_opt : std::nullopt;
-}
-
-}  // namespace eve_vtl_interface_converter
+}  
+}// namespace eve_vtl_interface_converter

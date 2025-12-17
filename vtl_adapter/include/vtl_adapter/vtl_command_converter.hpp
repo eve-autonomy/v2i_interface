@@ -23,7 +23,6 @@
 #include "v2i_interface_msgs/msg/infrastructure_command_array.hpp"
 
 // sub input
-#include "autoware_state_machine_msgs/msg/state_machine.hpp"
 
 #include "vtl_adapter/interface_converter_data_pipeline.hpp"
 #include "vtl_adapter/eve_vtl_interface_converter.hpp"
@@ -36,8 +35,6 @@ using MainInputCommand = tier4_v2x_msgs::msg::InfrastructureCommand;
 using MainOutputCommandArr = v2i_interface_msgs::msg::InfrastructureCommandArray;
 using MainOutputCommand = v2i_interface_msgs::msg::InfrastructureCommand;
 using InterfaceConverter = eve_vtl_interface_converter::EveVTLInterfaceConverter;
-
-using SubInputState = autoware_state_machine_msgs::msg::StateMachine;
 
 using InterfaceConverterMultiMap =
   std::unordered_multimap<uint8_t, std::shared_ptr<InterfaceConverter>>;
@@ -60,12 +57,6 @@ private:
   // Publisher
   rclcpp::Publisher<MainOutputCommandArr>::SharedPtr command_pub_;
 
-  // Subscription
-  rclcpp::Subscription<SubInputState>::SharedPtr state_sub_;
-
-  // Callback
-  void onState(const SubInputState::ConstSharedPtr msg);
-
   // Preprocess
   std::shared_ptr<InterfaceConverterMultiMap> createConverter(
     const MainInputCommandArr::ConstSharedPtr& original_command) const;
@@ -73,7 +64,6 @@ private:
     const std::shared_ptr<InterfaceConverterMultiMap>& converter_multimap) const;
 
   //member variables
-  SubInputState::ConstSharedPtr state_;
   std::shared_ptr<IFConverterDataPipeline> converter_pipeline_;
 };
 
