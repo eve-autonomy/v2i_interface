@@ -289,7 +289,7 @@ std::optional<std::string> EveVTLInterfaceConverter::convertADState() const
       node_->get_logger(), *node_->get_clock(), ERROR_THROTTLE_MSEC,
       "EveVTLInterfaceConverter::" << __func__ << ": state is invalid: mode=" << mode_);
   }
-  return is_valid_state ? permit_state_opt : std::nullopt;
+  return (is_valid_state) ? permit_state_opt : std::nullopt;
 }
 
 }  // namespace eve_vtl_interface_converter
