@@ -36,7 +36,8 @@ class EveVTLInterfaceConverter
 {
 public:
   EveVTLInterfaceConverter(
-    const InfrastructureCommand& input_command, rclcpp::Node* node);
+    const InfrastructureCommand& input_command, rclcpp::Node* node,
+    const OperationModeState::ConstSharedPtr& operation_mode_state);
 
   const std::shared_ptr<EveVTLAttr>& vtlAttribute() const;
   const InfrastructureCommand& command() const;
@@ -48,17 +49,11 @@ private:
   std::string convertInfraCommand(const uint8_t& input_command) const;
   std::optional<std::string> convertADState() const;
 
-  // Subscription
-  rclcpp::Subscription<OperationModeState>::SharedPtr sub_operation_mode_state_;
-
-  // Callback
-  void onOperationModeState(const OperationModeState::ConstSharedPtr msg);
-
   // Member variables
   InfrastructureCommand command_;
   std::shared_ptr<EveVTLAttr> vtl_attr_;
   rclcpp::Node* node_;
-  uint8_t mode_;
+  OperationModeState::ConstSharedPtr operation_mode_state_ptr_;
 };
 
 }  // namespace eve_vtl_interface_converter
