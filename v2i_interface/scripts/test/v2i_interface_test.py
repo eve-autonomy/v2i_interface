@@ -212,8 +212,6 @@ class V2iInterfaceTest(Node):
                 self._fp_send.write(', '.join('{}'.format(x)
                                               for x in reply_array))
                 self._fp_send.write('\n')
-            # window.refresh() は Tkinter のためメインスレッドでのみ実行可能。
-            # メインスレッドの window.read(timeout=100) で GUI は更新される。
             next_sleep = (
                 (((self._base_time - time.time()) * 1000) %
                  self._window_refresh_interval_ms) or self._window_refresh_interval_ms) / 1000
