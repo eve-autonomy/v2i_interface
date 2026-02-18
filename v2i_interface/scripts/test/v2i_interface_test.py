@@ -232,7 +232,6 @@ class V2iInterfaceTest(Node):
             pass
 
     def run(self):
-        global window
         global is_send_write
         global is_recv_write
         os.makedirs(os.path.dirname(self._recv_output_filename), exist_ok=True)
