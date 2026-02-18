@@ -1,7 +1,8 @@
 repos:
   - repo: https://github.com/tier4/pre-commit-hooks-ros
-    rev: v0.8.0
+    rev: v0.10.1
     hooks:
       - id: flake8-ros
+        additional_dependencies: [flake8,setuptools==65.0.0]
 
 exclude: .svg

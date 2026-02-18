@@ -29,15 +29,11 @@ Class public function
 */
 
 EveVTLInterfaceConverter::EveVTLInterfaceConverter(
-  const InfrastructureCommand& input_command, rclcpp::Node* node)
-  : command_(input_command), node_(node)
+  const InfrastructureCommand& input_command, rclcpp::Node* node,
+  const OperationModeState::ConstSharedPtr& operation_mode_state)
+  : command_(input_command), node_(node), operation_mode_state_ptr_(operation_mode_state)
 {
-  using namespace std::placeholders;
   init(input_command);
-
-  sub_operation_mode_state_ = node->create_subscription<OperationModeState>(
-    "/api/operation_mode/state", rclcpp::QoS{1}.transient_local(),
-    std::bind(&EveVTLInterfaceConverter::onOperationModeState, this, _1));
 }
 
 const std::shared_ptr<EveVTLAttr>& EveVTLInterfaceConverter::vtlAttribute() const
@@ -48,11 +44,6 @@ const std::shared_ptr<EveVTLAttr>& EveVTLInterfaceConverter::vtlAttribute() cons
 const InfrastructureCommand& EveVTLInterfaceConverter::command() const
 {
   return command_;
-}
-
-void EveVTLInterfaceConverter::onOperationModeState(const OperationModeState::ConstSharedPtr msg)
-{
-  mode_ = msg->mode;
 }
 
 std::optional<uint8_t> EveVTLInterfaceConverter::request() const
@@ -279,15 +270,21 @@ std::optional<std::string> EveVTLInterfaceConverter::convertADState() const
   bool is_valid_state = false;
 
   if (permit_state == eve_vtl_spec::VALUE_PERMIT_STATE_DRIVING) {
-    is_valid_state = (mode_ == OperationModeState::AUTONOMOUS);
+    if (operation_mode_state_ptr_ && operation_mode_state_ptr_->mode == OperationModeState::AUTONOMOUS) {
+      is_valid_state = true;
+    } else {
+      is_valid_state = false;
+    }
   } else if (permit_state == eve_vtl_spec::VALUE_PERMIT_STATE_NULL) {
     is_valid_state = true;
   }
 
   if (!is_valid_state) {
+    const int mode = operation_mode_state_ptr_ ? static_cast<int>(operation_mode_state_ptr_->mode) : -1;
     RCLCPP_WARN_STREAM_THROTTLE(
       node_->get_logger(), *node_->get_clock(), ERROR_THROTTLE_MSEC,
-      "EveVTLInterfaceConverter::" << __func__ << ": state is invalid: mode=" << mode_);
+      "EveVTLInterfaceConverter::" << __func__ << ": state is invalid: mode=" << mode
+        << ", permit_state=\"" << permit_state << "\"");
   }
   return (is_valid_state) ? permit_state_opt : std::nullopt;
 }

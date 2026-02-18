@@ -23,6 +23,7 @@
 #include "v2i_interface_msgs/msg/infrastructure_command_array.hpp"
 
 // sub input
+#include "autoware_adapi_v1_msgs/msg/operation_mode_state.hpp"
 
 #include "vtl_adapter/interface_converter_data_pipeline.hpp"
 #include "vtl_adapter/eve_vtl_interface_converter.hpp"
@@ -42,6 +43,7 @@ using InterfaceConverterMap =
   std::unordered_map<uint8_t, std::shared_ptr<InterfaceConverter>>;
 using IFConverterDataPipeline =
   interface_converter_data_pipeline::IFConverterDataPipeline;
+using OperationModeState = autoware_adapi_v1_msgs::msg::OperationModeState;
 
 class VtlCommandConverter
 {
@@ -51,11 +53,17 @@ public:
   std::shared_ptr<IFConverterDataPipeline> converterPipeline();
   void onCommand(const MainInputCommandArr::ConstSharedPtr msg);
 private:
+  void onOperationModeState(const OperationModeState::ConstSharedPtr msg);
+
   // Node
   rclcpp::Node* node_;
 
   // Publisher
   rclcpp::Publisher<MainOutputCommandArr>::SharedPtr command_pub_;
+
+  // Subscription: /api/operation_mode/state (single subscription, shared by all converters)
+  rclcpp::Subscription<OperationModeState>::SharedPtr sub_operation_mode_state_;
+  OperationModeState::ConstSharedPtr latest_operation_mode_state_;
 
   // Preprocess
   std::shared_ptr<InterfaceConverterMultiMap> createConverter(

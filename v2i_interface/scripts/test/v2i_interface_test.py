@@ -212,7 +212,6 @@ class V2iInterfaceTest(Node):
                 self._fp_send.write(', '.join('{}'.format(x)
                                               for x in reply_array))
                 self._fp_send.write('\n')
-            window.refresh()
             next_sleep = (
                 (((self._base_time - time.time()) * 1000) %
                  self._window_refresh_interval_ms) or self._window_refresh_interval_ms) / 1000
@@ -233,7 +232,6 @@ class V2iInterfaceTest(Node):
             pass
 
     def run(self):
-        global window
         global is_send_write
         global is_recv_write
         os.makedirs(os.path.dirname(self._recv_output_filename), exist_ok=True)

@@ -36,6 +36,11 @@ void VtlCommandConverter::init(rclcpp::Node* node)
   auto subscriber_option = rclcpp::SubscriptionOptions();
   subscriber_option.callback_group = group;
 
+  // Subscription: /api/operation_mode/state (latest value shared by all converters)
+  sub_operation_mode_state_ = node->create_subscription<OperationModeState>(
+    "/api/operation_mode/state", rclcpp::QoS{1}.transient_local(),
+    std::bind(&VtlCommandConverter::onOperationModeState, this, _1),
+    subscriber_option);
 
   // Publisher
   command_pub_ = node->create_publisher<MainOutputCommandArr>(
@@ -44,6 +49,11 @@ void VtlCommandConverter::init(rclcpp::Node* node)
 
   RCLCPP_INFO(node_->get_logger(),
     "VtlCommandConverter: initialized.");
+}
+
+void VtlCommandConverter::onOperationModeState(const OperationModeState::ConstSharedPtr msg)
+{
+  latest_operation_mode_state_ = msg;
 }
 
 std::shared_ptr<IFConverterDataPipeline> VtlCommandConverter::converterPipeline()
@@ -77,7 +87,7 @@ std::shared_ptr<InterfaceConverterMultiMap> VtlCommandConverter::createConverter
     } else if (orig_elem.state == MainInputCommand::FINALIZED) {
       continue;
     }
-    const auto converter(new InterfaceConverter(orig_elem, node_));
+    const auto converter(new InterfaceConverter(orig_elem, node_, latest_operation_mode_state_));
     if (!converter->vtlAttribute()) {
       RCLCPP_DEBUG(node_->get_logger(),
         "VtlCommandConverter:%s: invalid vtl attribute.", __func__);
