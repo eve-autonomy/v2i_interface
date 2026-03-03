@@ -281,7 +281,7 @@ std::optional<std::string> EveVTLInterfaceConverter::convertADState() const
 
   if (!is_valid_state) {
     const int mode = operation_mode_state_ptr_ ? static_cast<int>(operation_mode_state_ptr_->mode) : -1;
-    RCLCPP_WARN_STREAM_THROTTLE(
+    RCLCPP_DEBUG_STREAM_THROTTLE(
       node_->get_logger(), *node_->get_clock(), ERROR_THROTTLE_MSEC,
       "EveVTLInterfaceConverter::" << __func__ << ": state is invalid: mode=" << mode
         << ", permit_state=\"" << permit_state << "\"");
