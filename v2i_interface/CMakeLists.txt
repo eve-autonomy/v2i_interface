@@ -27,10 +27,8 @@ ament_auto_find_build_dependencies()
 ament_python_install_package(scripts)
 install(
   PROGRAMS
-  scripts/__init__.py
   scripts/v2i_interface.py
   scripts/udp_control.py
-  scripts/test/__init__.py
   scripts/test/v2i_interface_test.py
   DESTINATION
   lib/${PROJECT_NAME})
